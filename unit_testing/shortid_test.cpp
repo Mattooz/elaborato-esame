@@ -3,16 +3,12 @@
 
 using namespace quarantine_game;
 
-class shortid_test : public ::testing::Test {
-    virtual void SetUp() {}
-};
-
 /*
  * Using costant number to generate an id and test if the code worked.
  */
 const uint64_t test =  9978055103041796096L;
 
-TEST_F(shortid_test, id_test) {
+TEST(shortid_test, id_test) {
     string id = shortid::id(test);
 
     ASSERT_EQ("A4UOAs5KAQeOAo7K", id);
@@ -30,15 +26,15 @@ const string bad_id = "d4UgAw5KAQeOeo7K";
 /*
  * This tests also the index_of(char c) method
  */
-TEST_F(shortid_test, isid_test) {
-    ASSERT_EQ(shortid::is_id(good_id), true);
-    ASSERT_EQ(shortid::is_id(bad_id), false);
+TEST(shortid_test, isid_test) {
+    EXPECT_TRUE(shortid::is_id(good_id));
+    EXPECT_FALSE(shortid::is_id(bad_id));
 }
 
 /*
  * This test the get_new_id() and get_new_id(string s) methods. Also tests implicitly get_random_long() method.
  */
-TEST_F(shortid_test, getnewid_test) {
+TEST(shortid_test, getnewid_test) {
     //Good ids.
     string a = shortid::get_new_id();
     string b = shortid::get_new_id("test");
@@ -48,8 +44,8 @@ TEST_F(shortid_test, getnewid_test) {
     string c = shortid::get_new_id("tes");
 
     ASSERT_EQ(a.length(), 16);
-    ASSERT_EQ(shortid::is_id(a), true);
+    EXPECT_TRUE(shortid::is_id(a));
     ASSERT_EQ(b.length(), 16);
-    ASSERT_EQ(shortid::is_id(b), true);
+    EXPECT_TRUE(shortid::is_id(b));
     EXPECT_TRUE(c.empty());
 }
