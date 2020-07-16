@@ -1,10 +1,10 @@
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include "../shortid.h"
 
 using namespace quarantine_game;
 
 /*
- * Using costant number to generate an id and test if the code worked.
+ * Using constant number to generate an id and test if the code worked.
  */
 const uint64_t test =  9978055103041796096L;
 

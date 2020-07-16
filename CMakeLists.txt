@@ -4,7 +4,11 @@ project(elaborato_esame)
 set(CMAKE_CXX_STANDARD 14)
 
 add_subdirectory(unit_testing)
-add_library(core shortid.h shortid.cpp)
+add_library(core shortid.h shortid.cpp player.cpp player.h update_builder.h)
+
+find_package(nlohmann_json 3.2.0 REQUIRED)
+
+target_link_libraries(core PRIVATE nlohmann_json::nlohmann_json)
 
 add_executable(elaborato_esame main.cpp)
 target_link_libraries(elaborato_esame core)
