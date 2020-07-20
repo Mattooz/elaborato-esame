@@ -4,7 +4,7 @@
 
 #include "player.h"
 
-quarantine_game::player::player(string name, double money, uint8_t position, function<void()> &quit)
+quarantine_game::player::player(string name, double money, uint8_t position, function<void()> quit)
         : name(name), money(money), position(position), quit(quit) {
     this->turns_in_prison = 0;
     this->blocked_for = 0;

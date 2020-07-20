@@ -98,12 +98,4 @@ bool shortid::is_id(string id) {
     return true;
 }
 
-uint64_t shortid::get_random_long() {
-    random_device rd;
-    mt19937 mt(rd());
-    uniform_real_distribution<double> dist(0, 0xFFFFFFFFFFFFFFFF);
-
-    return (uint64_t) dist(mt);
-}
-
 

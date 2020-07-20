@@ -1,0 +1,32 @@
+{
+  "errors": [
+    {
+      "glitch": 1,
+      "message": "test error 1"
+    },
+    {
+      "glitch": 2,
+      "message": "test error 2"
+    }
+  ],
+  "successes": [
+    {
+      "glitch": 1,
+      "message": "test success 1"
+    },
+    {
+      "glitch": 2,
+      "message": "test success 2"
+    }
+  ],
+  "warnings": [
+    {
+      "glitch": 1,
+      "message": "test warning 1"
+    },
+    {
+      "glitch": 2,
+      "message": "test warning 2"
+    }
+  ]
+}

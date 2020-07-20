@@ -25,9 +25,11 @@ namespace quarantine_game {
         int8_t avoid;
         vector<json> updates;
         bool has_quit;
-        function<void()> &quit;
+        function<void()> quit;
     public:
-        player(string name, double money, uint8_t position, function<void()> &quit);
+        player() = delete;
+
+        player(string name, double money, uint8_t position, function<void()> quit);
 
         const string &_name() const;
 

@@ -1,6 +1,5 @@
 
 #include <string>
-#include <random>
 
 #ifndef GIOCHINO_DELLA_QUARENTENA_SHORTID_H
 #define GIOCHINO_DELLA_QUARENTENA_SHORTID_H
@@ -31,12 +30,6 @@ namespace quarantine_game {
         static uint8_t index_of(char c);
 
     public:
-        /**
-         * Generates a pseudo-random 64-bit unsigned integer.
-         *
-         * @return a 64-bit uinsigned integer
-         */
-        static uint64_t get_random_long();
         /**
         * Generates an id from a 64-bit unsigned number
         *

@@ -17,6 +17,9 @@ namespace quarantine_game {
      * All members are public and read-only.
      */
     struct update_game_container {
+        /*
+         * The members of this struct are vectors pointing to the objects inside the game class.
+         */
         const vector<player> *players;
         const uint32_t *turns;
         const bool *has_started;
@@ -28,7 +31,7 @@ namespace quarantine_game {
     class update_builder {
     public:
         /**
-         * "Other" methods add a given key and value.
+         * "Other" methods add a given key and value to the json object.
          * Using overloaded "other" methods because of lack of generic Object superclass (such as the one in Java).
          * Ugly but necessary.
          *
@@ -52,7 +55,8 @@ namespace quarantine_game {
     };
 
     /**
-     * Update builder class for the Game class. Used to build json updates for the game client.
+     * Update builder class for the Game class @see quarantine_game::game.
+     * Used to build json updates for the game client.
      */
     class game_update_builder : public update_builder {
     private:
@@ -63,6 +67,25 @@ namespace quarantine_game {
         json builder;
 
     public:
+
+        game_update_builder() = delete;
+
+        /**
+         * Creates a brand new builder.
+         *
+         * @param container the game container needed by the builder
+         */
+        explicit game_update_builder(update_game_container container) : container(container) {}
+
+        /**
+         * Modifies an already existing json update.
+         *
+         * @param container the game container needed by the builder
+         * @param builder the existing json update
+         */
+        game_update_builder(update_game_container container, json builder) : container(container),
+                                                                             builder(builder) {}
+
         /**
          * Adds the required information for a game update.
          * All updates should use with this method.
@@ -76,9 +99,9 @@ namespace quarantine_game {
          *
          * @param dice1 the number shown by the client in the first dice box
          * @param dice2 the number shown by the client in the second dice box
-         * @param new_pos if the movement is instant this should be the new position the player on the map. Otherwise it
-         *                should the sum of the two dice rolled.
-         * @param player the number of the player that should be moved.
+         * @param new_pos if the movement is instant this should be the new position of the player on the map. Otherwise
+         *        it should the sum of the two dice rolled.
+         * @param player the id of the player that should be moved.
          * @param instant determines whether the player will be move instantly or not.
          *
          * @return the builder
@@ -90,7 +113,7 @@ namespace quarantine_game {
          *
          * @param property the id of the property on the board.
          * @param player the id of the player.
-         * @return
+         * @return the builder
          */
         game_update_builder *color(uint8_t property, uint8_t player);
 
@@ -114,14 +137,16 @@ namespace quarantine_game {
         game_update_builder *new_glitch(string message, string title, vector<string> buttons);
 
         /**
-         * Adds a quit update to the json update.
+         * Adds a quit update to the json object.
          *
          * @param player_quit the player that quit
          * @param player_to if the game hasn't started this should be the new turn of the player
          */
         game_update_builder *quit(uint8_t player_quit, uint8_t player_to);
 
-        //TODO add the definitions
+        /*
+         * Overridden methods.
+         */
         game_update_builder *other(string key, string value) override;
 
         game_update_builder *other(string key, bool value) override;
@@ -131,6 +156,80 @@ namespace quarantine_game {
         game_update_builder *other(string key, int64_t value) override;
 
         game_update_builder *other(string key, double value) override;
+
+        json res() override {
+            return builder;
+        }
+    };
+
+    /**
+     * Update builder used by the glitch_handler class @see quarantine_game::glitch_handler.
+     * Used to build the updates sent to the Glitch Builder web interface.
+     *
+     * The glitch id can also be -1 and -2: -1 indicates general list errors such as "missing name", -2 indicates server
+     * errors.
+     */
+    class glitch_update_builder : public update_builder {
+    private:
+        json builder;
+    public:
+        /**
+        * Creates a brand new builder.
+        */
+        glitch_update_builder() = default;
+
+        /**
+         * Modifies an already existing json update.
+         *
+         * @param builder the existing json update
+         */
+        explicit glitch_update_builder(json builder) : builder(builder) {}
+
+
+        /**
+         * Adds a glitch error message to the json update. This will be displayed with red colored text on the builder.
+         * Errors prevent the glitch list from working correctly and must be fixed.
+         *
+         * @param message the message of the error
+         * @param glitch the id of the glitch
+         * @return the builder
+         */
+        glitch_update_builder *glitch_error(string message, int32_t glitch);
+
+        /**
+         * Adds a glitch warning message to the json update. This will be displayed with orange colored text on the
+         * builder.
+         * Warnings do not prevent the list from working, but should be still fixed.
+         *
+         * @param message the message of the warning
+         * @param glitch the id of the glitch
+         * @return the builder
+         */
+        glitch_update_builder *glitch_warning(string message, int32_t glitch);
+
+        /**
+         * Adds a glitch success message to the json update. This will be displayed with green colored text on the
+         * builder.
+         * Indicates a successful action made by the user.
+         *
+         * @param message the message
+         * @param glitch the id of the glitch
+         * @return the builder
+         */
+        glitch_update_builder *glitch_success(string message, int32_t glitch);
+
+        /*
+         * Overridden methods.
+         */
+        glitch_update_builder *other(string key, string value) override;
+
+        glitch_update_builder *other(string key, bool value) override;
+
+        glitch_update_builder *other(string key, uint64_t value) override;
+
+        glitch_update_builder *other(string key, int64_t value) override;
+
+        glitch_update_builder *other(string key, double value) override;
 
         json res() override {
             return builder;
