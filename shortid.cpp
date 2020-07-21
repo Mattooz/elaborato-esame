@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include "shortid.h"
+#include "utils.h"
 
 using namespace std;
 using namespace quarantine_game;
@@ -43,7 +44,7 @@ string shortid::id(uint64_t base) {
 }
 
 string shortid::get_new_id() {
-    uint64_t nmb = get_random_long();
+    uint64_t nmb = utils::get_random_long();
 
     return shortid::id(nmb);
 }
@@ -53,7 +54,7 @@ string shortid::get_new_id(string text) {
 
     uint64_t nmb = ((text.at(0) & 0xFFL) << 56) | ((text.at(0) & 0xFFL) << 48) |
                    ((text.at(2) & 0xFFL) << 40) | ((text.at(3) & 0xFFL) << 32) |
-                   (get_random_long() & 0x7FFFFFFF);
+                   (utils::get_random_long() & 0x7FFFFFFF);
 
     return shortid::id(nmb);
 }
