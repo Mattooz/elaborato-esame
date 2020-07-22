@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include "player.h"
 
 using namespace std;
@@ -119,14 +120,20 @@ namespace quarantine_game {
      */
     class map {
     private:
-        vector<box *> boxes;
+        string map_name;
+        string map_id;
+        vector<shared_ptr<box>> boxes;
     public:
         /**
          * Constructor for the map class.
          *
          * @param boxes a vector containing the boxes of the map.
          */
-        explicit map(const vector<box *> &boxes);
+        explicit map(const vector<shared_ptr<box>> &boxes, string map_name, string map_id);
+
+        const string &_map_name() const;
+
+        const string &_map_id() const;
 
         /**
          * Gets the cost of a specific property_box.
@@ -198,7 +205,7 @@ namespace quarantine_game {
          * @param player the id of the player
          * @return the properties of the player. If the player has no properties it will return an empty vector.
          */
-        vector<property_box *> get_player_properties(uint8_t player);
+        vector<weak_ptr<property_box>> get_player_properties(uint8_t player);
 
         /**
          * Deletes all the properties of a player
@@ -211,19 +218,19 @@ namespace quarantine_game {
          * @param pos the position of the box
          * @return a box. If no box is found it returns nullptr.
          */
-        box *operator[](uint8_t pos);
+        weak_ptr<box> operator[](uint8_t pos);
 
         /**
          * @param name the name of the property.
          * @return a property box. If no box is found at the given name it returns nullptr.
          */
-        property_box *operator[](string name);
+        weak_ptr<property_box> operator[](string name);
 
         /**
          * @param id the id of the property.
          * @return a property box. If no box is found at the given id it returns nullptr.
          */
-        property_box *from_id(uint8_t id);
+        weak_ptr<property_box> from_id(uint8_t id);
 
         virtual ~map();
     };

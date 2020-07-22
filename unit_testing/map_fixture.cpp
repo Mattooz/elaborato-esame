@@ -6,25 +6,26 @@ using namespace quarantine_game;
 class map_suite : public ::testing::Test {
 protected:
     virtual void SetUp() {
-        dynamic_cast<property_box*>(box9)->_owner() = 1;
-        dynamic_cast<property_box*>(box10)->_owner() = 1;
+        dynamic_pointer_cast<property_box>(box9)->_owner() = 1;
+        dynamic_pointer_cast<property_box>(box10)->_owner() = 1;
     }
 
-    box *box1 = new functional_box(0, "start");
-    box *box2 = new property_box(1, 0, 50, "test-1");
-    box *box3 = new property_box(2, 1, 50, "test-2");
-    box *box4 = new property_box(3, 2, 50, "test-3");
-    box *box5 = new functional_box(4, "glitch");
-    box *box6 = new property_box(5, 3, 50, "test-4");
-    box *box7 = new property_box(6, 4, 50, "test-5");
-    box *box8 = new functional_box(7, "glitch");
-    box *box9 = new property_box(8, 5, 50, "test-6");
-    box *box10 = new property_box(9, 6, 50, "test-7");
-    box *box11 = new functional_box(10, "goto-prison");
-    box *box12 = new property_box(11, 7, 50, "test-8");
-    box *box13 = new property_box(12, 8, 50, "test-9");
+    shared_ptr<box> box1{new functional_box(0, "start")};
+    shared_ptr<box> box2{new property_box(1, 0, 50, "test-1")};
+    shared_ptr<box> box3{new property_box(2, 1, 50, "test-2")};
+    shared_ptr<box> box4{new property_box(3, 2, 50, "test-3")};
+    shared_ptr<box> box5{new functional_box(4, "glitch")};
+    shared_ptr<box> box6{new property_box(5, 3, 50, "test-4")};
+    shared_ptr<box> box7{new property_box(6, 4, 50, "test-5")};
+    shared_ptr<box> box8{new functional_box(7, "glitch")};
+    shared_ptr<box> box9{new property_box(8, 5, 50, "test-6")};
+    shared_ptr<box> box10{new property_box(9, 6, 50, "test-7")};
+    shared_ptr<box> box11{new functional_box(10, "goto-prison")};
+    shared_ptr<box> box12{new property_box(11, 7, 50, "test-8")};
+    shared_ptr<box> box13{new property_box(12, 8, 50, "test-9")};
 
-    quarantine_game::map map{{box1, box2, box3, box4, box5, box6, box7, box8, box9, box10, box11, box12, box13}};
+    quarantine_game::map map{{box1, box2, box3, box4, box5, box6, box7, box8, box9, box10, box11, box12, box13},
+                             "name", "id"};
 
 };
 
@@ -49,23 +50,23 @@ TEST_F(map_suite, test_pos) {
 }
 
 TEST_F(map_suite, test_op_pos) {
-    auto it = map[10];
-    auto it1 = map[11];
+    auto it = map[10].lock();
+    auto it1 = map[11].lock();
 
-    auto functional = dynamic_cast<functional_box *>(it);
+    auto functional = dynamic_pointer_cast<functional_box>(it);
     string type;
 
-    if(functional) type = functional->_type();
+    if (functional) type = functional->_type();
 
     EXPECT_TRUE(functional);
     ASSERT_EQ(type, "goto-prison");
 
-    auto property = dynamic_cast<property_box *>(it1);
+    auto property = dynamic_pointer_cast<property_box>(it1);
     string name;
     uint8_t id = 0xFF;
     int32_t cost = -1;
 
-    if(property) {
+    if (property) {
         name = property->_name();
         id = property->_id();
         cost = property->_cost();
@@ -78,16 +79,16 @@ TEST_F(map_suite, test_op_pos) {
 }
 
 TEST_F(map_suite, test_op_name) {
-    auto it = map["test-2"];
-    auto it1 = map["test not found"];
+    auto it = map["test-2"].lock();
+    auto it1 = map["test not found"].lock();
 
-    auto property = dynamic_cast<property_box *>(it);
+    auto property = dynamic_pointer_cast<property_box>(it);
 
     string name;
     uint8_t id = 0xFF;
     int32_t cost = -1;
 
-    if(property) {
+    if (property) {
         name = property->_name();
         id = property->_id();
         cost = property->_cost();
@@ -102,16 +103,16 @@ TEST_F(map_suite, test_op_name) {
 }
 
 TEST_F(map_suite, test_fromid) {
-    auto it = map.from_id(1);
-    auto it1 = map.from_id(9);
+    auto it = map.from_id(1).lock();
+    auto it1 = map.from_id(9).lock();
 
-    auto property = dynamic_cast<property_box *>(it);
+    auto property = dynamic_pointer_cast<property_box>(it);
 
     string name;
     uint8_t id = 0xFF;
     int32_t cost = -1;
 
-    if(property) {
+    if (property) {
         name = property->_name();
         id = property->_id();
         cost = property->_cost();

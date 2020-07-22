@@ -1,0 +1,180 @@
+{
+  "boxes": [
+    {
+      "position": 0,
+      "type": "start"
+    },
+    {
+      "cost": 60,
+      "name": "Filettole",
+      "position": 1,
+      "id": 0
+    },
+    {
+      "cost": 60,
+      "name": "Castellina",
+      "position": 2,
+      "id": 1
+    },
+    {
+      "position": 3,
+      "type": "glitch"
+    },
+    {
+      "cost": 100,
+      "name": "Centrale",
+      "position": 4,
+      "id": 2
+    },
+    {
+      "position": 5,
+      "type": "glitch"
+    },
+    {
+      "cost": 100,
+      "name": "Coverciano",
+      "position": 6,
+      "id": 3
+    },
+    {
+      "cost": 120,
+      "name": "Rifredi",
+      "position": 7,
+      "id": 4
+    },
+    {
+      "position": 8,
+      "type": "glitch"
+    },
+    {
+      "position": 9,
+      "type": "prison"
+    },
+    {
+      "cost": 140,
+      "name": "Torretta",
+      "position": 10,
+      "id": 5
+    },
+    {
+      "cost": 140,
+      "name": "Montepiano",
+      "position": 11,
+      "id": 6
+    },
+    {
+      "position": 12,
+      "type": "glitch"
+    },
+    {
+      "cost": 160,
+      "name": "Fate",
+      "position": 13,
+      "id": 7
+    },
+    {
+      "cost": 180,
+      "name": "Otel",
+      "position": 14,
+      "id": 8
+    },
+    {
+      "cost": 180,
+      "name": "Le croci",
+      "position": 15,
+      "id": 9
+    },
+    {
+      "position": 16,
+      "type": "glitch"
+    },
+    {
+      "position": 17,
+      "type": "other"
+    },
+    {
+      "position": 18,
+      "type": "glitch"
+    },
+    {
+      "cost": 200,
+      "name": "Agliana",
+      "position": 19,
+      "id": 10
+    },
+    {
+      "cost": 220,
+      "name": "Ponticello",
+      "position": 20,
+      "id": 11
+    },
+    {
+      "cost": 220,
+      "name": "Magia",
+      "position": 21,
+      "id": 12
+    },
+    {
+      "position": 22,
+      "type": "glitch"
+    },
+    {
+      "cost": 240,
+      "name": "Domo",
+      "position": 23,
+      "id": 13
+    },
+    {
+      "cost": 260,
+      "name": "Carraia",
+      "position": 24,
+      "id": 14
+    },
+    {
+      "position": 25,
+      "type": "glitch"
+    },
+    {
+      "position": 26,
+      "type": "goto-prison"
+    },
+    {
+      "position": 27,
+      "type": "glitch"
+    },
+    {
+      "cost": 260,
+      "name": "Capalbio",
+      "position": 28,
+      "id": 15
+    },
+    {
+      "cost": 280,
+      "name": "Abetone",
+      "position": 29,
+      "id": 16
+    },
+    {
+      "position": 30,
+      "type": "glitch"
+    },
+    {
+      "cost": 350,
+      "name": "Barcellona",
+      "position": 31,
+      "id": 17
+    },
+    {
+      "cost": 350,
+      "name": "Curvino",
+      "position": 32,
+      "id": 18
+    },
+    {
+      "position": 33,
+      "type": "glitch"
+    }
+  ],
+  "name": "default-map",
+  "id": "wWawlqCiQS61gCiy"
+}
