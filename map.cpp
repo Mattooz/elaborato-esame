@@ -90,7 +90,7 @@ uint8_t quarantine_game::map::pos(uint8_t id) {
 }
 
 uint8_t quarantine_game::map::distance_to_next_glitch(uint8_t pos) {
-    if (pos > boxes.size()) return 0xFF;
+    if (pos >= boxes.size()) return 0xFF;
 
     for (int i = 0, l = -1, distance = 1, check = 0;; i = (i + 1) % boxes.size()) {
         box *b = boxes[i];
@@ -129,7 +129,7 @@ bool quarantine_game::map::is_glitch(uint8_t pos) {
 }
 
 uint8_t quarantine_game::map::distance_to_prison(uint8_t pos) {
-    if (pos > boxes.size()) return 0xFF;
+    if (pos >= boxes.size()) return 0xFF;
 
     for (int i = 0, l = -1, distance = 1, check = 0;; i = (i + 1) % boxes.size()) {
         box *b = boxes[i];
@@ -141,7 +141,7 @@ uint8_t quarantine_game::map::distance_to_prison(uint8_t pos) {
             if (boxes[i]->_position() == ((boxes[l]->_position() + distance) % boxes.size())) {
                 auto functional = dynamic_cast<functional_box *>(b);
 
-                if (functional && functional->_type() == "prison" && distance > 1) {
+                if (functional && functional->_type() == "goto-prison" && distance > 1) {
                     return distance;
                 }
 
@@ -161,7 +161,7 @@ bool quarantine_game::map::is_prison(uint8_t pos) {
         if (a) {
             auto functional = dynamic_cast<functional_box *>(a);
 
-            if (functional && functional->_type() == "prison") return true;
+            if (functional && functional->_type() == "goto-prison") return true;
         }
     }
     return false;
@@ -216,6 +216,12 @@ quarantine_game::property_box *quarantine_game::map::from_id(uint8_t id) {
         } else continue;
     }
     return nullptr;
+}
+
+quarantine_game::map::~map() {
+    for(auto & it : boxes) {
+        delete it;
+    }
 }
 
 quarantine_game::box::box(uint8_t position) : position(position) {}

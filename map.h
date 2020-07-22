@@ -224,6 +224,8 @@ namespace quarantine_game {
          * @return a property box. If no box is found at the given id it returns nullptr.
          */
         property_box *from_id(uint8_t id);
+
+        virtual ~map();
     };
 
 
