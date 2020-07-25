@@ -320,7 +320,7 @@ void quarantine_game::game::player_quit(uint8_t player) {
         else {
             auto a = it.lock();
 
-            to_old_format.insert(a->_id(), a->_houses());
+            to_old_format.insert({a->_id(), a->_houses()});
         }
     }
 

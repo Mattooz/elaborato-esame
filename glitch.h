@@ -10,6 +10,8 @@
 
 using namespace std;
 
+class glitch_suite;
+
 namespace quarantine_game {
     class action {
     private:
@@ -24,13 +26,14 @@ namespace quarantine_game {
 
     class glitch {
     private:
+        friend class glitch_factory;
+        friend class ::glitch_suite;
+
         string message;
         string title;
         vector<weak_ptr<player>> required;
         vector<action> actions;
         vector<string> buttons;
-
-        friend class glitch_factory;
     public:
         glitch(const string &message, const string &title, const vector<action> &actions, const vector<string> &buttons);
         const string &_message() const;

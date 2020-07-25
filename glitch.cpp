@@ -9,13 +9,14 @@ void quarantine_game::action::operator+(const function<void()> &runnable) {
 }
 
 void quarantine_game::action::run() {
-    for(auto & it : runnables)
+    for (auto &it : runnables)
         it();
 }
 
 
 quarantine_game::glitch::glitch(const string &message, const string &title, const vector<action> &actions,
-                                const vector<string> &buttons) {}
+                                const vector<string> &buttons) : message(message), title(title), actions(actions),
+                                                                 buttons(buttons) {}
 
 const string &quarantine_game::glitch::_message() const {
     return message;
@@ -38,7 +39,9 @@ const uint8_t quarantine_game::glitch::action_count() {
 }
 
 void quarantine_game::glitch::choose_action(uint8_t option) {
-    if(option >= actions.size()) return;
+    if (option >= actions.size())
+        return;
+
 
     actions[option].run();
 }
