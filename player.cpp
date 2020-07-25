@@ -66,3 +66,11 @@ json quarantine_game::player::get_update() {
         updates.erase(updates.begin());
     }
 }
+
+bool quarantine_game::player::operator==(quarantine_game::player p) {
+    return name == p._name() && position != p._position();
+}
+
+bool quarantine_game::player::operator!=(quarantine_game::player p) {
+    return name != p._name() && position != p._position();
+}

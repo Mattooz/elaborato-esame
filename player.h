@@ -50,6 +50,9 @@ namespace quarantine_game {
         void delete_updates();
 
         json get_update();
+
+        bool operator!=(player p);
+        bool operator==(player p);
     };
 
 }

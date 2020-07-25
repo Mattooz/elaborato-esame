@@ -28,6 +28,8 @@ namespace quarantine_game {
          * @return the contents of the file. If it fails to find the file returns "not found".
          */
         static string read_file(const string &path_to_file) noexcept;
+
+        static uint8_t get_random_dice();
     };
 }
 

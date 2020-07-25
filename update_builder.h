@@ -47,6 +47,8 @@ namespace quarantine_game {
 
         virtual update_builder *other(string key, double value) = 0;
 
+        virtual update_builder *other_null(string key) = 0;
+
         /**
         * Returns the finished json object
         * @return a json object
@@ -106,7 +108,7 @@ namespace quarantine_game {
          *
          * @return the builder
          */
-        game_update_builder *move(uint8_t dice1, uint8_t dice2, uint8_t new_pos, uint8_t player, bool instant);
+        game_update_builder *move(uint8_t dice1, uint8_t dice2, int8_t new_pos, uint8_t player, bool instant);
 
         /**
          * Changes the color of the property chosen based on the id of the given player.
@@ -156,6 +158,8 @@ namespace quarantine_game {
         game_update_builder *other(string key, int64_t value) override;
 
         game_update_builder *other(string key, double value) override;
+
+        update_builder *other_null(string key) override;
 
         json res() override {
             return builder;
@@ -230,6 +234,8 @@ namespace quarantine_game {
         glitch_update_builder *other(string key, int64_t value) override;
 
         glitch_update_builder *other(string key, double value) override;
+
+        update_builder *other_null(string key) override;
 
         json res() override {
             return builder;

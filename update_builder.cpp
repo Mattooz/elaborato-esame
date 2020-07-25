@@ -30,7 +30,7 @@ quarantine_game::game_update_builder *quarantine_game::game_update_builder::star
 }
 
 quarantine_game::game_update_builder *
-quarantine_game::game_update_builder::move(uint8_t dice1, uint8_t dice2, uint8_t new_pos, uint8_t player,
+quarantine_game::game_update_builder::move(uint8_t dice1, uint8_t dice2, int8_t new_pos, uint8_t player,
                                            bool instant) {
     json update_player_pos;
 
@@ -145,6 +145,11 @@ quarantine_game::game_update_builder *quarantine_game::game_update_builder::othe
     return this;
 }
 
+quarantine_game::update_builder *quarantine_game::game_update_builder::other_null(string key) {
+    builder[key] = nullptr;
+    return this;
+}
+
 quarantine_game::glitch_update_builder *
 quarantine_game::glitch_update_builder::glitch_error(string message, int32_t glitch) {
     json error;
@@ -224,5 +229,10 @@ quarantine_game::glitch_update_builder *quarantine_game::glitch_update_builder::
 
 quarantine_game::glitch_update_builder *quarantine_game::glitch_update_builder::other(string key, double value) {
     builder[key] = value;
+    return this;
+}
+
+quarantine_game::update_builder *quarantine_game::glitch_update_builder::other_null(string key) {
+    builder[key] = nullptr;
     return this;
 }

@@ -135,6 +135,8 @@ namespace quarantine_game {
 
         const string &_map_id() const;
 
+        const uint32_t box_count() const;
+
         /**
          * Gets the cost of a specific property_box.
          *

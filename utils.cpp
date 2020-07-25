@@ -30,3 +30,11 @@ uint64_t quarantine_game::utils::get_random_long() {
 
     return (uint64_t) dist(mt);
 }
+
+uint8_t quarantine_game::utils::get_random_dice() {
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_real_distribution<double> dist(0, 7);
+
+    return (uint64_t) dist(mt);
+}

@@ -237,6 +237,10 @@ const string &quarantine_game::map::_map_name() const {
     return map_name;
 }
 
+const uint32_t quarantine_game::map::box_count() const {
+    return boxes.size();
+}
+
 
 quarantine_game::box::box(uint8_t position) : position(position) {}
 
