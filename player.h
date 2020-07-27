@@ -35,7 +35,7 @@ namespace quarantine_game {
 
         double &_money();
 
-        uint8_t &_position();
+        uint8_t & _position();
 
         uint8_t &_turns_in_prison();
 

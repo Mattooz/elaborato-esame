@@ -31,15 +31,17 @@ namespace quarantine_game {
 
         string message;
         string title;
-        vector<weak_ptr<player>> required;
+        vector<player*> required;
         vector<action> actions;
         vector<string> buttons;
+        uint8_t requires;
     public:
-        glitch(const string &message, const string &title, const vector<action> &actions, const vector<string> &buttons);
+        glitch(const string &message, const string &title, const vector<action> &actions, const vector<string> &buttons,
+                uint8_t requires);
         const string &_message() const;
         const string &_title() const;
         const vector<string> &_buttons() const;
-        weak_ptr<player> get_player() const;
+        player* get_player() const;
         const uint8_t action_count();
         void choose_action(uint8_t option);
 

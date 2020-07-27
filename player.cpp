@@ -20,7 +20,7 @@ double &quarantine_game::player::_money() {
     return player::money;
 }
 
-uint8_t &quarantine_game::player::_position() {
+uint8_t & quarantine_game::player::_position() {
     return player::position;
 }
 

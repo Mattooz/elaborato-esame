@@ -238,7 +238,7 @@ void quarantine_game::game::move_player(uint8_t p_turn, quarantine_game::player 
         json update = create_move_update(p_turn, dice1, dice2, (instant ? new_pos : dice1 + dice2), instant);
 
         for (auto &it : players) {
-            if (glitch._title() == "empty" || *glitch.get_player().lock() != it)
+            if (glitch._title() == "empty" || *glitch.get_player() != it)
                 it.add_update(update);
             else {
                 json custom = create_move_update(p_turn, dice1, dice2, (instant ? new_pos : dice1 + dice2),
@@ -488,7 +488,7 @@ json quarantine_game::game::create_player_quit_update(uint8_t player_quit, int8_
     builder->start()
             ->quit(player_quit, player_to)
             ->move(0, 0, -1, 0, true)
-            ->other_null("newImp")
+            ->other_null("newGlitch")
             ->other("hasStarted", has_started);
 
     for(auto keys = properties.begin(); keys != properties.end(); keys++) {

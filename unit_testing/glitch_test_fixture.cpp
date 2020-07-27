@@ -35,7 +35,7 @@ protected:
 
     vector<action> actions {action1, action2};
 
-    glitch c{"test message", "test title", actions, buttons};
+    glitch c{"test message", "test title", actions, buttons, 1};
 };
 
 TEST_F(glitch_suite, test_chose_action1) {

@@ -15,8 +15,10 @@ void quarantine_game::action::run() {
 
 
 quarantine_game::glitch::glitch(const string &message, const string &title, const vector<action> &actions,
-                                const vector<string> &buttons) : message(message), title(title), actions(actions),
-                                                                 buttons(buttons) {}
+                                const vector<string> &buttons, uint8_t requires) : message(message), title(title),
+                                                                                   actions(actions),
+                                                                                   buttons(buttons),
+                                                                                   requires(requires){}
 
 const string &quarantine_game::glitch::_message() const {
     return message;
@@ -30,7 +32,7 @@ const vector<string> &quarantine_game::glitch::_buttons() const {
     return buttons;
 }
 
-weak_ptr<quarantine_game::player> quarantine_game::glitch::get_player() const {
+quarantine_game::player* quarantine_game::glitch::get_player() const {
     return required[0];
 }
 

@@ -12,6 +12,17 @@ find_package(spdlog REQUIRED)
 target_link_libraries(core PUBLIC nlohmann_json::nlohmann_json)
 target_link_libraries(core PUBLIC spdlog::spdlog)
 
+set(BOOST_ROOT "/Users/niccolomattei/Boost/boost_1_73_0")
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+find_package(Boost 1.73.0 COMPONENTS)
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    target_link_libraries(core ${Boost_LIBRARIES})
+endif()
+
 add_executable(elaborato_esame main.cpp)
 target_link_libraries(elaborato_esame core)
 

@@ -14,13 +14,13 @@
 
 namespace quarantine_game {
     struct glitch_game_container {
-        const vector<player> *players;
+        vector<player> *players;
         int8_t *redirect_to;
         int8_t *can_roll_again;
         const function<json(uint8_t, uint8_t, uint8_t, uint8_t, bool)> create_move_update;
         const function<uint8_t(string)> get_player_turn;
 
-        glitch_game_container(const vector<player> *players, int8_t *redirectTo, int8_t *canRollAgain,
+        glitch_game_container(vector<player> *players, int8_t *redirectTo, int8_t *canRollAgain,
                               const function<json(uint8_t, uint8_t, uint8_t, uint8_t, bool)> &createMoveUpdate,
                               const function<uint8_t(string)> &getPlayerTurn);
     };
@@ -53,12 +53,16 @@ namespace quarantine_game {
         glitch building;
 
         void parse_action(string action, glitch_game_container &state);
+        uint8_t get_random_player(uint8_t p_turn, quarantine_game::glitch_game_container &state);
+        json get_random_glitch(glitch_game_container & state);
+        uint32_t get_random_num();
     public:
         explicit glitch_factory(string glitch_list);
 
         glitch glitch(uint8_t player, glitch_game_container &state);
         class glitch goto_prison(uint8_t player, glitch_game_container &state);
         static class glitch empty_glitch();
+
 
     };
 }

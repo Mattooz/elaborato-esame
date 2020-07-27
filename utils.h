@@ -2,6 +2,7 @@
 // Created by Niccolò Mattei on 17/07/2020.
 //
 #include <string>
+#include <vector>
 
 #ifndef ELABORATO_ESAME_UTILS_H
 #define ELABORATO_ESAME_UTILS_H
@@ -30,6 +31,11 @@ namespace quarantine_game {
         static string read_file(const string &path_to_file) noexcept;
 
         static uint8_t get_random_dice();
+
+        static uint32_t get_random_num(uint32_t max);
+
+        static vector<string> split(const string &input, const string &regex);
+
     };
 }
 
