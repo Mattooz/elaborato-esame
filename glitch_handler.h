@@ -10,6 +10,7 @@
 #define ELABORATO_ESAME_GLITCH_HANDLER_H
 
 #define LAMBDA_FUNCTION_DECL [&]()
+#define EMPTY_LAMBDA [&](){}
 
 
 namespace quarantine_game {
@@ -36,6 +37,8 @@ namespace quarantine_game {
         static json from_name(string name);
 
         static vector<string> list_names();
+
+        static vector<json> lists();
 
         static json check_for_errors(json to_check);
 

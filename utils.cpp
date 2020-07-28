@@ -58,3 +58,27 @@ std::vector<std::string> quarantine_game::utils::split(const string& input, cons
     return {first, last};
 }
 
+bool quarantine_game::utils::is_number(string s) {
+    try {
+        stod(s);
+        return true;
+    } catch(exception &e) {
+        return false;
+    }
+}
+
+bool quarantine_game::utils::is_integer(string s) {
+    try {
+        stoi(s);
+        return true;
+    } catch(exception &e) {
+        return false;
+    }
+}
+
+quarantine_game::game_error::game_error(const string &what) : _what(what) {}
+
+const char *quarantine_game::game_error::what() const noexcept {
+    return _what.c_str();
+}
+

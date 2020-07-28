@@ -36,6 +36,17 @@ namespace quarantine_game {
 
         static vector<string> split(const string &input, const string &regex);
 
+        static bool is_number(string s);
+
+        static bool is_integer(string s);
+    };
+
+    class game_error : public exception {
+    private:
+        string _what;
+    public:
+        explicit game_error(const string &what);
+        const char *what() const noexcept override;
     };
 }
 
