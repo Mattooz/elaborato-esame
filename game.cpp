@@ -9,6 +9,9 @@
 
 #define INFO(msg) spdlog::info(msg)
 
+const nlohmann::json quarantine_game::game::not_ok_status = {{"ok", false}};
+const nlohmann::json quarantine_game::game::ok_status = {{"ok", true}};
+
 quarantine_game::game::game(string host, double starting_money, string glitch_list, string map_name) : starting_money(
         starting_money), factory(glitch_factory(glitch_list)), game_map(map_factory::from_name(map_name)),
                                                                                                        glitch(glitch_factory::empty_glitch()) {
@@ -42,6 +45,12 @@ const uint32_t &quarantine_game::game::_turns() const {
 bool quarantine_game::game::full() {
     return players.size() == 6;
 }
+
+
+quarantine_game::map &quarantine_game::game::map() {
+    return game_map;
+}
+
 
 const uint8_t quarantine_game::game::player_count() const {
     return players.size();
@@ -491,7 +500,7 @@ json quarantine_game::game::create_player_quit_update(uint8_t player_quit, int8_
             ->other_null("newGlitch")
             ->other("hasStarted", has_started);
 
-    for(auto keys = properties.begin(); keys != properties.end(); keys++) {
+    for (auto keys = properties.begin(); keys != properties.end(); keys++) {
         builder->color(keys->first, -1)->house_count(keys->first, 0);
     }
 
@@ -514,7 +523,7 @@ json quarantine_game::game::add_glitch_update(json update) {
 }
 
 json quarantine_game::game::add_glitch_update(json update, string title) {
-    game_update_builder builder {{&players, &turns, &has_started}, update};
+    game_update_builder builder{{&players, &turns, &has_started}, update};
 
     builder.new_glitch(glitch._message(), title, glitch._buttons());
 
@@ -522,9 +531,8 @@ json quarantine_game::game::add_glitch_update(json update, string title) {
 }
 
 void quarantine_game::game::send_to_all(json update) {
-    for(auto &player : players) {
+    for (auto &player : players) {
         player.add_update(update);
     }
 }
-
 

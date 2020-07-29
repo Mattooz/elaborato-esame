@@ -16,8 +16,6 @@ using namespace std;
 namespace quarantine_game {
     class game {
     private:
-        const static json ok_status;
-        const static json not_ok_status;
         int8_t can_roll_again;
         int8_t redirect_to;
         bool goto_prison;
@@ -38,6 +36,7 @@ namespace quarantine_game {
         void start();
         const bool &started() const;
         const uint32_t &_turns() const;
+        quarantine_game::map &map();
         bool full();
         const uint8_t player_count() const;
         void add_player(string name);
@@ -69,6 +68,9 @@ namespace quarantine_game {
         json add_glitch_update(json update);
         json add_glitch_update(json update, string title);
         void send_to_all(json update);
+
+        const static json not_ok_status;
+        const static json ok_status;
     };
 }
 

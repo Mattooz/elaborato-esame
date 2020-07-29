@@ -12,6 +12,8 @@ find_package(spdlog REQUIRED)
 target_link_libraries(core PUBLIC nlohmann_json::nlohmann_json)
 target_link_libraries(core PUBLIC spdlog::spdlog)
 
+include_directories(/Users/niccolomattei/Simple-Web-Server)
+
 set(BOOST_ROOT "/Users/niccolomattei/Boost/boost_1_73_0")
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)

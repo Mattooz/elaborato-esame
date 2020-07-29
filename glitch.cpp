@@ -3,6 +3,7 @@
 //
 
 #include "glitch.h"
+#include <iostream>
 
 void quarantine_game::action::operator+(const function<void()> &runnable) {
     runnables.push_back(runnable);
