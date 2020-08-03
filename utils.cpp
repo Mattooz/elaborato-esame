@@ -7,8 +7,11 @@
 #include <iostream>
 #include <random>
 #include <regex>
+#include <boost/locale.hpp>
 
-string quarantine_game::utils::read_file(const string &path_to_file) noexcept {
+using namespace boost::locale;
+
+string quarantine_game::Utils::read_file(const string &path_to_file) noexcept {
     string s = "";
 
     ifstream _stream{path_to_file};
@@ -24,24 +27,31 @@ string quarantine_game::utils::read_file(const string &path_to_file) noexcept {
     return s;
 }
 
-uint64_t quarantine_game::utils::get_random_long() {
+wstring quarantine_game::Utils::read_utf8_file(const string &path_to_file) noexcept {
+    wstring begin = conv::to_utf<wchar_t>(read_file(path_to_file), "UTF-8");
+    wstring end = conv::utf_to_utf<wchar_t>(begin);
+
+    return end;
+}
+
+uint64_t quarantine_game::Utils::get_random_long() {
     random_device rd;
     mt19937_64 mt(rd());
-    uniform_int_distribution<uint64_t > dist(numeric_limits<uint64_t >::min(),
-                                                       numeric_limits<uint64_t >::max());
+    uniform_int_distribution<uint64_t> dist(numeric_limits<uint64_t>::min(),
+                                            numeric_limits<uint64_t>::max());
 
     return (uint64_t) dist(mt);
 }
 
-uint8_t quarantine_game::utils::get_random_dice() {
+uint8_t quarantine_game::Utils::get_random_dice() {
     random_device rd;
     mt19937 mt(rd());
-    uniform_int_distribution<uint8_t> dist(0, 7);
+    uniform_int_distribution<uint8_t> dist(1, 6);
 
     return (uint8_t) dist(mt);
 }
 
-uint32_t quarantine_game::utils::get_random_num(uint32_t max) {
+uint32_t quarantine_game::Utils::get_random_num(uint32_t max) {
     random_device rd;
     mt19937 mt(rd());
     uniform_int_distribution<uint32_t> dist(0, max);
@@ -49,7 +59,7 @@ uint32_t quarantine_game::utils::get_random_num(uint32_t max) {
     return (uint32_t) dist(mt);
 }
 
-std::vector<std::string> quarantine_game::utils::split(const string& input, const string& regex) {
+std::vector<std::string> quarantine_game::Utils::split(const string &input, const string &regex) {
     // passing -1 as the submatch index parameter performs splitting
     std::regex re(regex);
     std::sregex_token_iterator
@@ -58,23 +68,26 @@ std::vector<std::string> quarantine_game::utils::split(const string& input, cons
     return {first, last};
 }
 
-bool quarantine_game::utils::is_number(string s) {
+bool quarantine_game::Utils::is_number(string s) {
     try {
         stod(s);
         return true;
-    } catch(exception &e) {
+    } catch (exception &e) {
         return false;
     }
 }
 
-bool quarantine_game::utils::is_integer(string s) {
+bool quarantine_game::Utils::is_integer(string s) {
     try {
         stoi(s);
         return true;
-    } catch(exception &e) {
+    } catch (exception &e) {
         return false;
     }
 }
+
+
+
 
 quarantine_game::game_error::game_error(const string &what) : _what(what) {}
 

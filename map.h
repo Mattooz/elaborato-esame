@@ -12,7 +12,7 @@ namespace quarantine_game {
     /**
      * Base class for all the boxes on the board.
      */
-    class box {
+    class Box {
     protected:
         uint8_t position;
 
@@ -21,21 +21,25 @@ namespace quarantine_game {
          *
          * @param position the position on the map.
          */
-        explicit box(uint8_t position);
+        explicit Box(uint8_t position);
 
     public:
+        //TODO Render abstract
+
         /*
-         * Required in order to make box polymorphic and add safety while casting.
+         * Required in order to make Box polymorphic and add safety while casting.
          */
         virtual const uint8_t &_position() const;
 
-        virtual ~box();
+        virtual ~Box();
     };
+
+    //TODO Add enum of types
 
     /**
      * Derived class from box. Used to represent the "glitch" and "prison" boxes.
      */
-    class functional_box : public box {
+    class Functional_Box : public Box {
     private:
         string type;
     public:
@@ -45,7 +49,7 @@ namespace quarantine_game {
          * @param position the position of the box.
          * @param type the type of the functional box. Can either be "glitch", "goto-prison", "prison" or "start".
          */
-        functional_box(uint8_t position, const string &type);
+        Functional_Box(uint8_t position, const string &type);
 
         /**
          * @return the type of the box.
@@ -54,13 +58,13 @@ namespace quarantine_game {
 
         const uint8_t &_position() const override;
 
-        ~functional_box() override;
+        ~Functional_Box() override;
     };
 
     /**
      * Derived class from box. Used to represent the property boxes on the map.
      */
-    class property_box : public box {
+    class Property_Box : public Box {
     private:
         uint8_t id;
         int32_t cost;
@@ -77,7 +81,7 @@ namespace quarantine_game {
          * @param cost the cost of the property.
          * @param name the name of the property.
          */
-        property_box(uint8_t position, uint8_t id, int32_t cost, const string &name);
+        Property_Box(uint8_t position, uint8_t id, int32_t cost, const string &name);
 
         /**
          * @return the id of the box.
@@ -110,7 +114,7 @@ namespace quarantine_game {
 
         const uint8_t &_position() const override;
 
-        virtual ~property_box() override;
+        virtual ~Property_Box() override;
     };
 
     /**
@@ -118,18 +122,20 @@ namespace quarantine_game {
      *
      * All the methods in this class are able to handle an unordered vector of boxes.
      */
-    class map {
+    class Map {
     private:
         string map_name;
         string map_id;
-        vector<shared_ptr<box>> boxes;
+        vector<shared_ptr<Box>> boxes;
     public:
+        const static uint8_t not_found = 0xFF;
+
         /**
          * Constructor for the map class.
          *
          * @param boxes a vector containing the boxes of the map.
          */
-        explicit map(const vector<shared_ptr<box>> &boxes, string map_name, string map_id);
+        explicit Map(const vector<shared_ptr<Box>> &boxes, string map_name, string map_id);
 
         const string &_map_name() const;
 
@@ -207,7 +213,7 @@ namespace quarantine_game {
          * @param player the id of the player
          * @return the properties of the player. If the player has no properties it will return an empty vector.
          */
-        vector<weak_ptr<property_box>> get_player_properties(uint8_t player);
+        vector<weak_ptr<Property_Box>> get_player_properties(uint8_t player);
 
         /**
          * Deletes all the properties of a player
@@ -220,21 +226,21 @@ namespace quarantine_game {
          * @param pos the position of the box
          * @return a box. If no box is found it returns nullptr.
          */
-        weak_ptr<box> operator[](uint8_t pos);
+        weak_ptr<Box> operator[](uint8_t pos);
 
         /**
          * @param name the name of the property.
          * @return a property box. If no box is found at the given name it returns nullptr.
          */
-        weak_ptr<property_box> operator[](string name);
+        weak_ptr<Property_Box> operator[](string name);
 
         /**
          * @param id the id of the property.
          * @return a property box. If no box is found at the given id it returns nullptr.
          */
-        weak_ptr<property_box> from_id(uint8_t id);
+        weak_ptr<Property_Box> from_id(uint8_t id);
 
-        virtual ~map();
+        virtual ~Map();
     };
 
 

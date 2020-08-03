@@ -12,21 +12,22 @@
 #define LAMBDA_FUNCTION_DECL [&]()
 #define EMPTY_LAMBDA [&](){}
 
+class Glitch_factory_fixture;
 
 namespace quarantine_game {
-    struct glitch_game_container {
-        vector<player> *players;
+    struct GlitchGameContainer {
+        vector<weak_ptr<Player>> players;
         int8_t *redirect_to;
         int8_t *can_roll_again;
         const function<json(uint8_t, uint8_t, uint8_t, uint8_t, bool)> create_move_update;
         const function<uint8_t(string)> get_player_turn;
 
-        glitch_game_container(vector<player> *players, int8_t *redirectTo, int8_t *canRollAgain,
-                              const function<json(uint8_t, uint8_t, uint8_t, uint8_t, bool)> &createMoveUpdate,
-                              const function<uint8_t(string)> &getPlayerTurn);
+        GlitchGameContainer(vector<weak_ptr<Player>> players, int8_t *redirectTo, int8_t *canRollAgain,
+                            function<json(uint8_t, uint8_t, uint8_t, uint8_t, bool)> createMoveUpdate,
+                            function<uint8_t(string)> getPlayerTurn);
     };
 
-    class glitch_handler {
+    class GlitchHandler {
     private:
         const static string glitch_folder;
     public:
@@ -42,29 +43,31 @@ namespace quarantine_game {
 
         static json check_for_errors(json to_check);
 
-        static json check_for_errors(json to_check, glitch_update_builder *builder);
+        static json check_for_errors(json to_check, GlitchUpdateBuilder *builder);
 
-        static json check_for_action_errors(int32_t glitch, string action, glitch_update_builder *builder);
+        static json check_for_action_errors(int32_t glitch, string action, GlitchUpdateBuilder *builder);
 
         static vector<string> contains_player_reference(string message, uint8_t player_required);
     };
 
-    class glitch_factory {
+    class GlitchFactory {
     private:
         json glitches;
         int32_t previous;
-        glitch building;
+        Glitch building;
 
-        void parse_action(string action, glitch_game_container &state);
-        uint8_t get_random_player(uint8_t p_turn, quarantine_game::glitch_game_container &state);
-        json get_random_glitch(glitch_game_container & state);
+        void parse_action(string action, GlitchGameContainer &state);
+        uint8_t get_random_player(uint8_t p_turn, quarantine_game::GlitchGameContainer &state);
+        json get_random_glitch(GlitchGameContainer & state);
         uint32_t get_random_num();
-    public:
-        explicit glitch_factory(string glitch_list);
 
-        glitch glitch(uint8_t player, glitch_game_container &state);
-        class glitch goto_prison(uint8_t player, glitch_game_container &state);
-        static class glitch empty_glitch();
+        friend class ::Glitch_factory_fixture;
+    public:
+        explicit GlitchFactory(string glitch_list);
+
+        Glitch glitch(uint8_t player, GlitchGameContainer &state);
+        class Glitch goto_prison(uint8_t player, GlitchGameContainer &state);
+        static class Glitch empty_glitch();
 
 
     };

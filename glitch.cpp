@@ -5,43 +5,43 @@
 #include "glitch.h"
 #include <iostream>
 
-void quarantine_game::action::operator+(const function<void()> &runnable) {
+void quarantine_game::Action::operator+(const function<void()> &runnable) {
     runnables.push_back(runnable);
 }
 
-void quarantine_game::action::run() {
+void quarantine_game::Action::run() {
     for (auto &it : runnables)
         it();
 }
 
 
-quarantine_game::glitch::glitch(const string &message, const string &title, const vector<action> &actions,
+quarantine_game::Glitch::Glitch(const string &message, const string &title, const vector<Action> &actions,
                                 const vector<string> &buttons, uint8_t requires) : message(message), title(title),
                                                                                    actions(actions),
                                                                                    buttons(buttons),
                                                                                    requires(requires){}
 
-const string &quarantine_game::glitch::_message() const {
+const string &quarantine_game::Glitch::_message() const {
     return message;
 }
 
-const string &quarantine_game::glitch::_title() const {
+const string &quarantine_game::Glitch::_title() const {
     return title;
 }
 
-const vector<string> &quarantine_game::glitch::_buttons() const {
+const vector<string> &quarantine_game::Glitch::_buttons() const {
     return buttons;
 }
 
-quarantine_game::player* quarantine_game::glitch::get_player() const {
+weak_ptr<quarantine_game::Player> quarantine_game::Glitch::get_player() const {
     return required[0];
 }
 
-const uint8_t quarantine_game::glitch::action_count() {
+const uint8_t quarantine_game::Glitch::action_count() {
     return actions.size();
 }
 
-void quarantine_game::glitch::choose_action(uint8_t option) {
+void quarantine_game::Glitch::choose_action(uint8_t option) {
     if (option >= actions.size())
         return;
 

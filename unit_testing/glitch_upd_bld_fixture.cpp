@@ -8,7 +8,7 @@ using namespace quarantine_game;
 /*
  * Correct json output generated with the Java version of the builder.
  */
-const string correct_json_glitch_update = utils::read_file(
+const string correct_json_glitch_update = Utils::read_file(
         "/Users/niccolomattei/CLionProjects/elaborato-esame/unit_testing/glitch_builder_json_output.json");
 
 class glitch_upd_bld_suite : public ::testing::Test {
@@ -22,7 +22,7 @@ protected:
                 ->glitch_success("test success 2", 2);
     }
 
-    glitch_update_builder *builder1 = new glitch_update_builder();
+    GlitchUpdateBuilder *builder1 = new GlitchUpdateBuilder();
 };
 
 TEST_F(glitch_upd_bld_suite, test_result_json) {

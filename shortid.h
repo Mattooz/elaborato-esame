@@ -14,7 +14,7 @@ namespace quarantine_game {
      * This ids are 16 characters long generated from a single 64-bit unsigned number (uint64) using the Base64
      * character set. They are URL safe and are used to generate the game ids.
      */
-    class shortid {
+    class ShortId {
 
     private:
         /**

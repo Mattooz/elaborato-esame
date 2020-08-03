@@ -30,16 +30,16 @@ protected:
 
     vector<string> buttons{"test1", "test2"};
 
-    action action1;
-    action action2;
+    Action action1;
+    Action action2;
 
-    vector<action> actions {action1, action2};
+    vector<Action> actions {action1, action2};
 
-    glitch c{"test message", "test title", actions, buttons, 1};
+    Glitch c{"test message", "test title", actions, buttons, 1};
 };
 
 TEST_F(glitch_suite, test_chose_action1) {
-    //Choosing action 1
+    //Choosing Action 1
     c.choose_action(0);
 
     ASSERT_EQ(test, "TEST 1");
@@ -47,7 +47,7 @@ TEST_F(glitch_suite, test_chose_action1) {
 }
 
 TEST_F(glitch_suite, test_chose_action2) {
-    //Choosing action 2
+    //Choosing Action 2
     c.choose_action(1);
 
     ASSERT_EQ(test, "TEST 2");

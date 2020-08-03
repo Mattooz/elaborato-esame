@@ -9,7 +9,7 @@ using namespace quarantine_game;
 const uint64_t test =  9978055103041796096L;
 
 TEST(shortid_test, id_test) {
-    string id = shortid::id(test);
+    string id = ShortId::id(test);
 
     ASSERT_EQ("A4UOAs5KAQeOAo7K", id);
 }
@@ -27,8 +27,8 @@ const string bad_id = "d4UgAw5KAQeOeo7K";
  * This tests also the index_of(char c) method
  */
 TEST(shortid_test, isid_test) {
-    EXPECT_TRUE(shortid::is_id(good_id));
-    EXPECT_FALSE(shortid::is_id(bad_id));
+    EXPECT_TRUE(ShortId::is_id(good_id));
+    EXPECT_FALSE(ShortId::is_id(bad_id));
 }
 
 /*
@@ -36,16 +36,16 @@ TEST(shortid_test, isid_test) {
  */
 TEST(shortid_test, getnewid_test) {
     //Good ids.
-    string a = shortid::get_new_id();
-    string b = shortid::get_new_id("test");
+    string a = ShortId::get_new_id();
+    string b = ShortId::get_new_id("test");
 
     //It is a requirement that the given string is longer than 4 characters in order to work.
     //This should then return a nullptr.
-    string c = shortid::get_new_id("tes");
+    string c = ShortId::get_new_id("tes");
 
     ASSERT_EQ(a.length(), 16);
-    EXPECT_TRUE(shortid::is_id(a));
+    EXPECT_TRUE(ShortId::is_id(a));
     ASSERT_EQ(b.length(), 16);
-    EXPECT_TRUE(shortid::is_id(b));
+    EXPECT_TRUE(ShortId::is_id(b));
     EXPECT_TRUE(c.empty());
 }

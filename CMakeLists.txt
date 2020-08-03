@@ -9,21 +9,21 @@ add_library(core shortid.h shortid.cpp player.cpp player.h update_builder.h upda
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(spdlog REQUIRED)
 
-target_link_libraries(core PUBLIC nlohmann_json::nlohmann_json)
-target_link_libraries(core PUBLIC spdlog::spdlog)
-
 include_directories(/Users/niccolomattei/Simple-Web-Server)
 
 set(BOOST_ROOT "/Users/niccolomattei/Boost/boost_1_73_0")
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost 1.73.0 COMPONENTS)
+find_package(Boost COMPONENTS locale)
 
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
-    target_link_libraries(core ${Boost_LIBRARIES})
+    target_link_libraries(core PUBLIC ${Boost_LIBRARIES} ${Boost_LOCALE_LIBRARY})
 endif()
+
+target_link_libraries(core PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(core PUBLIC spdlog::spdlog)
 
 add_executable(elaborato_esame main.cpp)
 target_link_libraries(elaborato_esame core)

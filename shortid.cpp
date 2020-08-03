@@ -10,13 +10,13 @@
 using namespace std;
 using namespace quarantine_game;
 
-const char shortid::chars[64] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+const char ShortId::chars[64] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
                                  'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
                                  'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
                                  't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
                                  '8', '9', '-', '_'};
 
-string shortid::id(uint64_t base) {
+string ShortId::id(uint64_t base) {
     uint8_t bytes[16];
 
     bytes[0] = (uint8_t) (base & 0x3F);
@@ -43,28 +43,28 @@ string shortid::id(uint64_t base) {
     return res;
 }
 
-string shortid::get_new_id() {
-    uint64_t nmb = utils::get_random_long();
+string ShortId::get_new_id() {
+    uint64_t nmb = Utils::get_random_long();
 
-    return shortid::id(nmb);
+    return ShortId::id(nmb);
 }
 
-string shortid::get_new_id(string text) {
+string ShortId::get_new_id(string text) {
     if (text.length() < 4) return "";
 
     uint64_t nmb = ((text.at(0) & 0xFFL) << 56) | ((text.at(0) & 0xFFL) << 48) |
                    ((text.at(2) & 0xFFL) << 40) | ((text.at(3) & 0xFFL) << 32) |
-                   (utils::get_random_long() & 0x7FFFFFFF);
+                   (Utils::get_random_long() & 0x7FFFFFFF);
 
-    return shortid::id(nmb);
+    return ShortId::id(nmb);
 }
 
-uint8_t shortid::index_of(char c) {
-    for (uint8_t i = 0; i < 64; i++) if (shortid::chars[i] == c) return i;
+uint8_t ShortId::index_of(char c) {
+    for (uint8_t i = 0; i < 64; i++) if (ShortId::chars[i] == c) return i;
     return 65;
 }
 
-bool shortid::is_id(string id) {
+bool ShortId::is_id(string id) {
     if (id.length() != 16) return false;
 
     uint8_t bytes[16];

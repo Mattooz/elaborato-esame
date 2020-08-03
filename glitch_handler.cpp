@@ -13,121 +13,126 @@
 #include <spdlog/spdlog.h>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <utility>
 
-#define PLAYERS (*state.players)
 #define ERROR(msg) spdlog::error(msg)
 
 using namespace std::filesystem;
 
 
-quarantine_game::glitch_game_container::glitch_game_container(vector<player> *players, int8_t *redirectTo,
-                                                              int8_t *canRollAgain,
-                                                              const function<json(uint8_t, uint8_t, uint8_t, uint8_t,
-                                                                                  bool)> &createMoveUpdate,
-                                                              const function<uint8_t(string)> &getPlayerTurn) : players(
-        players), redirect_to(redirectTo), can_roll_again(canRollAgain), create_move_update(createMoveUpdate),
-                                                                                                                get_player_turn(
-                                                                                                                        getPlayerTurn) {}
+quarantine_game::GlitchGameContainer::GlitchGameContainer(vector<weak_ptr<Player>> players, int8_t *redirectTo,
+                                                          int8_t *canRollAgain,
+                                                          function<json(uint8_t, uint8_t, uint8_t, uint8_t,
+                                                                            bool)> createMoveUpdate,
+                                                          function<uint8_t(string)> getPlayerTurn) : players(
+        std::move(players)), redirect_to(redirectTo), can_roll_again(canRollAgain), create_move_update(
+        std::move(createMoveUpdate)), get_player_turn(std::move(getPlayerTurn)) {}
 
-quarantine_game::glitch_factory::glitch_factory(string glitch_list) : building(empty_glitch()),
-                                                                      glitches(glitch_handler::from_name(glitch_list)),
-                                                                      previous(-1) {}
+quarantine_game::GlitchFactory::GlitchFactory(string glitch_list) : building(empty_glitch()),
+                                                                    glitches(GlitchHandler::from_name(std::move(glitch_list))),
+                                                                    previous(-1) {}
 
-quarantine_game::glitch quarantine_game::glitch_factory::empty_glitch() {
-    return quarantine_game::glitch("empty", "empty", {}, {}, 0);
+quarantine_game::Glitch quarantine_game::GlitchFactory::empty_glitch() {
+    return quarantine_game::Glitch("empty", "empty", {}, {}, 0);
 }
 
-void quarantine_game::glitch_factory::parse_action(string action, quarantine_game::glitch_game_container &state) {
+void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game::GlitchGameContainer &state) {
     if (action.empty()) {
-        class action ac;
+        class Action ac;
         ac + LAMBDA_FUNCTION_DECL {};
         building.actions.push_back(ac);
     }
 
-    auto split_comma = utils::split(action, ",");
+    auto split_comma = Utils::split(action, ",");
 
     for (auto a : split_comma) {
         if (a.empty()) continue;
 
-        auto split_and = utils::split(a, "and");
+        auto split_and = Utils::split(a, "and");
 
-        class action ac;
+        class Action ac;
         for (auto b : split_and) {
             boost::algorithm::trim(b);
             if (b.empty()) continue;
-            auto split_space = utils::split(b, " ");
+            auto split_space = Utils::split(b, " ");
 
+            auto pl = building.get_player();
+
+            if (pl.expired()) throw game_error("Error while parsing Action! First Player pointer is expired");
+
+            auto pla = pl.lock();
 
             auto &c = split_space[0];
             if (c == "pay") {
                 if (split_space[1] == "rnd") {
-                    int32_t rnd = utils::get_random_num(51);
+                    int32_t rnd = Utils::get_random_num(51);
 
                     ac + LAMBDA_FUNCTION_DECL {
-                        int32_t cost = abs((building.get_player()->_money() / 100) * rnd);
+                        int32_t cost = abs((pla->_money() / 100) * rnd);
 
-                        building.get_player()->_money() -= cost;
+                        pla->_money() -= cost;
                     };
                     boost::replace_all(building.message, "<money>", to_string(rnd) + "%");
                 } else {
                     double percent = stod(split_space[1]);
                     if (percent <= 1) {
                         ac + LAMBDA_FUNCTION_DECL {
-                            int32_t cost = abs(building.get_player()->_money() * percent);
+                            int32_t cost = abs(pla->_money() * percent);
 
-                            building.get_player()->_money() += cost;
+                            pla->_money() += cost;
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent) + "%");
                     } else {
                         ac + LAMBDA_FUNCTION_DECL {
-                            building.get_player()->_money() += percent;
+                            pla->_money() += percent;
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent));
                     }
                 }
             } else if (c == "cash-in") {
                 if (split_space[1] == "rnd") {
-                    int32_t rnd = utils::get_random_num(51);
+                    int32_t rnd = Utils::get_random_num(51);
 
                     ac + LAMBDA_FUNCTION_DECL {
-                        int32_t cost = abs((building.get_player()->_money() / 100) * rnd);
+                        int32_t cost = abs((pla->_money() / 100) * rnd);
 
-                        building.get_player()->_money() += cost;
+                        pla->_money() += cost;
                     };
                     boost::replace_all(building.message, "<money>", to_string(rnd) + "%");
                 } else {
                     double percent = stod(split_space[1]);
                     if (percent <= 1) {
                         ac + LAMBDA_FUNCTION_DECL {
-                            int32_t cost = abs(building.get_player()->_money() * percent);
+                            int32_t cost = abs(pla->_money() * percent);
 
-                            building.get_player()->_money() += cost;
+                            pla->_money() += cost;
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent) + "%");
                     } else {
                         ac + LAMBDA_FUNCTION_DECL {
-                            building.get_player()->_money() += percent;
+                            pla->_money() += percent;
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent));
                     }
                 }
             } else if (c == "get-transaction") {
                 ac + LAMBDA_FUNCTION_DECL {
-                    *state.redirect_to = state.get_player_turn(building.get_player()->_name());
+                    *state.redirect_to = state.get_player_turn(pla->_name());
                 };
             } else if (c == "roll-again") {
                 ac + LAMBDA_FUNCTION_DECL {
-                    *state.can_roll_again = state.get_player_turn(building.get_player()->_name());
+                    *state.can_roll_again = state.get_player_turn(pla->_name());
                 };
             } else if (c == "avoid") {
                 int8_t avoid = stoi(split_space[1]);
                 ac + LAMBDA_FUNCTION_DECL {
-                    building.get_player()->_avoid() = avoid;
+                    pla->_avoid() = avoid;
                 };
             } else if (c == "stop") {
                 int8_t stop = stoi(split_space[1]);
                 ac + LAMBDA_FUNCTION_DECL {
-                    building.get_player()->_blocked_for() = stop;
+                    pla->_blocked_for() = stop;
                 };
             } else if (c == "ok") {
                 ac + LAMBDA_FUNCTION_DECL {};
@@ -141,78 +146,87 @@ void quarantine_game::glitch_factory::parse_action(string action, quarantine_gam
 }
 
 
-quarantine_game::glitch
-quarantine_game::glitch_factory::glitch(uint8_t player, quarantine_game::glitch_game_container &state) {
+quarantine_game::Glitch
+quarantine_game::GlitchFactory::glitch(uint8_t player, quarantine_game::GlitchGameContainer &state) {
     building = empty_glitch();
 
     json random_glitch = get_random_glitch(state);
 
     building.message = random_glitch["message"];
     building.title = "IMPREVISTO";
-    building.requires = random_glitch["requires"];
-    building.required.push_back(&PLAYERS[player]);
+    building.requires = stoi(random_glitch["requires"].get<string>());
 
-    boost::replace_all(building.message, "<player_1>", building.required[0]->_name());
+    auto p = state.players[player];
+    if (p.expired()) throw game_error("Error while creating Glitch! First Player pointer is expired.");
+
+    building.required.push_back(p);
+
+    boost::replace_all(building.message, "<player_1>", building.required[0].lock()->_name());
 
     for (int i = 1; i < building.requires; i++) {
         uint8_t rnd_pl = get_random_player(player, state);
-        building.required.push_back(&PLAYERS[rnd_pl]);
+
+        auto p1 = state.players[rnd_pl];
+        if (p1.expired()) throw game_error("Error while creating Glitch! Other Player pointer is expired.");
+
+        building.required.push_back(p1);
     }
 
-    parse_action(random_glitch["action"], state);
+    parse_action(random_glitch["Action"], state);
 
     for (auto &it : random_glitch["buttons"]) building.buttons.push_back(it);
 
     return building;
 }
 
-quarantine_game::glitch
-quarantine_game::glitch_factory::goto_prison(uint8_t player, quarantine_game::glitch_game_container &state) {
-    vector<action> actions;
+quarantine_game::Glitch
+quarantine_game::GlitchFactory::goto_prison(uint8_t player, quarantine_game::GlitchGameContainer &state) {
+    vector<Action> actions;
     vector<string> buttons;
 
-    action ac;
+    Action ac;
 
     ac + LAMBDA_FUNCTION_DECL {
         json update = state.create_move_update(player, 1, 1, 9, true);
-        for (auto it : PLAYERS) {
-            it.add_update(update);
+        for (auto it : state.players) {
+            if (it.expired()) throw game_error("Error while creating goto_prison Glitch! Player pointer is null!");
+            it.lock()->add_update(update);
         }
 
-        PLAYERS[player]._position() = 9;
+        state.players[player].lock()->_position() = 9;
     };
 
     actions.push_back(ac);
     buttons.emplace_back("Entra in prigione");
 
-    class glitch gl{
+    class Glitch gl{
             "Sei finito sulla casella \"vai in prigione\". Passerai i prossimi 3 turni fermo in prigione a meno che tu non riesca ad uscirne tirando due dadi uguali",
             "VAI IN PRIGIONE", actions, buttons, 1};
 
-    gl.required.push_back(&PLAYERS[player]);
+    gl.required.push_back(state.players[player]);
 
     return gl;
 }
 
 uint8_t
-quarantine_game::glitch_factory::get_random_player(uint8_t p_turn, quarantine_game::glitch_game_container &state) {
-    if (PLAYERS.size() == 1) return 0xFF;
+quarantine_game::GlitchFactory::get_random_player(uint8_t p_turn, quarantine_game::GlitchGameContainer &state) {
+    if (state.players.size() == 1) return 0xFF;
 
-    uint8_t res = utils::get_random_num(PLAYERS.size());
+    uint8_t res = Utils::get_random_num(state.players.size());
     if (res == p_turn) return get_random_player(p_turn, state);
 
     return res;
 }
 
-json quarantine_game::glitch_factory::get_random_glitch(quarantine_game::glitch_game_container &state) {
+json quarantine_game::GlitchFactory::get_random_glitch(quarantine_game::GlitchGameContainer &state) {
     json res = glitches.at(get_random_num());
 
-    if (res["requires"] > PLAYERS.size()) return get_random_glitch(state);
+    if (stoi(res["requires"].get<string>())> state.players.size()) return get_random_glitch(state);
     return res;
 }
 
-uint32_t quarantine_game::glitch_factory::get_random_num() {
-    uint32_t res = utils::get_random_num(glitches.size());
+uint32_t quarantine_game::GlitchFactory::get_random_num() {
+    uint32_t res = Utils::get_random_num(glitches.size() - 1);
 
     if (res == previous) return get_random_num();
     else previous = res;
@@ -221,9 +235,9 @@ uint32_t quarantine_game::glitch_factory::get_random_num() {
 }
 
 
-const std::string quarantine_game::glitch_handler::glitch_folder = "/Users/niccolomattei/CLionProjects/elaborato-esame/resources/glitchlists";
+const std::string quarantine_game::GlitchHandler::glitch_folder = "/Users/niccolomattei/CLionProjects/elaborato-esame/resources/glitchlists";
 
-void quarantine_game::glitch_handler::update_glitch_file(string id, string content) {
+void quarantine_game::GlitchHandler::update_glitch_file(string id, string content) {
     ofstream of{glitch_folder + "/" + id + ".json", ofstream::trunc};
     unsigned char bom[] = {0xEF, 0xBB, 0xBF};
     of.write((char *) bom, sizeof(bom));
@@ -231,17 +245,17 @@ void quarantine_game::glitch_handler::update_glitch_file(string id, string conte
     of.close();
 }
 
-json quarantine_game::glitch_handler::from_id(string id) {
+json quarantine_game::GlitchHandler::from_id(string id) {
     for (auto &it : lists()) if (it["id"] == id) return it["glitches"];
     return nlohmann::json();
 }
 
-json quarantine_game::glitch_handler::from_name(string name) {
+json quarantine_game::GlitchHandler::from_name(string name) {
     for (auto &it : lists()) if (it["name"] == name) return it["glitches"];
     return nlohmann::json();
 }
 
-vector<string> quarantine_game::glitch_handler::list_names() {
+vector<string> quarantine_game::GlitchHandler::list_names() {
     vector<string> names;
 
     for (auto &it : lists()) {
@@ -251,14 +265,20 @@ vector<string> quarantine_game::glitch_handler::list_names() {
     return names;
 }
 
-vector<json> quarantine_game::glitch_handler::lists() {
+vector<json> quarantine_game::GlitchHandler::lists() {
     vector<json> res;
 
-    for (auto &it : directory_iterator(glitch_handler::glitch_folder)) {
-        string s = utils::read_file(it.path());
+    for (auto &it : directory_iterator(GlitchHandler::glitch_folder)) {
+        wstring s = Utils::read_utf8_file(it.path());
+
+        //Avoid annoying hidden os files. Took me so much time to figure this out...
+        if(it.path().stem().string() == ".DS_Store") continue;
+
+        wcout << s << endl;
+
         json read = json::parse(s);
 
-        if (!shortid::is_id(it.path().stem().string())) continue;
+        if (!ShortId::is_id(it.path().stem().string())) continue;
         read["id"] = it.path().stem().string();
 
         res.push_back(read);
@@ -267,12 +287,12 @@ vector<json> quarantine_game::glitch_handler::lists() {
     return res;
 }
 
-json quarantine_game::glitch_handler::check_for_errors(json to_check) {
-    glitch_update_builder builder;
+json quarantine_game::GlitchHandler::check_for_errors(json to_check) {
+    GlitchUpdateBuilder builder;
     return check_for_errors(to_check, &builder);
 }
 
-json quarantine_game::glitch_handler::check_for_errors(json to_check, quarantine_game::glitch_update_builder *builder) {
+json quarantine_game::GlitchHandler::check_for_errors(json to_check, quarantine_game::GlitchUpdateBuilder *builder) {
     if (!to_check.contains("name"))
         builder->glitch_error("Nome della lista non presente all'interno della richiesta", -1);
     else {
@@ -385,11 +405,11 @@ json quarantine_game::glitch_handler::check_for_errors(json to_check, quarantine
             }
         }
 
-        if (!a.contains("action"))
+        if (!a.contains("Action"))
             builder->glitch_error("Questo imprevisto non contiene le azioni dei rispettivi bottoni", i);
         else {
             try {
-                action = a["action"].get<string>();
+                action = a["Action"].get<string>();
             } catch (exception &e) {
                 builder->glitch_error("Le azioni di questo imprevisto sono in un formato sconosciuto", i);
                 continue;
@@ -400,7 +420,7 @@ json quarantine_game::glitch_handler::check_for_errors(json to_check, quarantine
         }
 
         if (!buttons.empty() && !action.empty()) {
-            if (buttons.size() != utils::split(action, ",").size()) {
+            if (buttons.size() != Utils::split(action, ",").size()) {
                 builder->glitch_error("C'è una discrepanza tra il numero di bottoni e quello delle azioni", i);
                 continue;
             } else {
@@ -423,28 +443,28 @@ json quarantine_game::glitch_handler::check_for_errors(json to_check, quarantine
     return nlohmann::json();
 }
 
-json quarantine_game::glitch_handler::check_for_action_errors(int32_t glitch, string action,
-                                                              quarantine_game::glitch_update_builder *builder) {
+json quarantine_game::GlitchHandler::check_for_action_errors(int32_t glitch, string action,
+                                                             quarantine_game::GlitchUpdateBuilder *builder) {
 
-    auto split_comma = utils::split(action, ",");
+    auto split_comma = Utils::split(action, ",");
 
     for (auto a : split_comma) {
         if (a.empty()) continue;
 
-        auto split_and = utils::split(a, "and");
+        auto split_and = Utils::split(a, "and");
 
-        class action ac;
+        class Action ac;
         for (auto b : split_and) {
             boost::algorithm::trim(b);
             if (b.empty()) continue;
-            auto split_space = utils::split(b, " ");
+            auto split_space = Utils::split(b, " ");
 
 
             auto &c = split_space[0];
             if (c == "pay") {
                 if (split_space.size() != 2)
                     builder->glitch_error("'pay' richiede <b>solo</b> un argomento", glitch);
-                else if (!(split_space[1] == "rnd") && !utils::is_number(split_space[1]))
+                else if (!(split_space[1] == "rnd") && !Utils::is_number(split_space[1]))
                     builder->glitch_error(
                             "Il comando 'pay' accetta solo un numero o il tag 'rnd' come argomento. Il tuo parametro: " +
                             split_space[1],
@@ -452,7 +472,7 @@ json quarantine_game::glitch_handler::check_for_action_errors(int32_t glitch, st
             } else if (c == "cash-in") {
                 if (split_space.size() != 2)
                     builder->glitch_error("'cash-in' richiede <b>solo</b> un argomento", glitch);
-                else if (!(split_space[1] == "rnd") && !utils::is_number(split_space[1]))
+                else if (!(split_space[1] == "rnd") && !Utils::is_number(split_space[1]))
                     builder->glitch_error(
                             "Il comando 'cash-in' accetta solo un numero o il tag 'rnd' come argomento. Il tuo parametro: " +
                             split_space[1],
@@ -464,7 +484,7 @@ json quarantine_game::glitch_handler::check_for_action_errors(int32_t glitch, st
             } else if (c == "avoid") {
                 if (split_space.size() != 2)
                     builder->glitch_error("'avoid' richiede <b>solo</b> un argomento", glitch);
-                else if (!utils::is_integer(split_space[1]))
+                else if (!Utils::is_integer(split_space[1]))
                     builder->glitch_error(
                             "Il comando 'avoid' accetta solo un numero intero. Il tuo parametro: " +
                             split_space[1],
@@ -473,7 +493,7 @@ json quarantine_game::glitch_handler::check_for_action_errors(int32_t glitch, st
             } else if (c == "stop") {
                 if (split_space.size() != 2)
                     builder->glitch_error("'stop' richiede <b>solo</b> un argomento", glitch);
-                else if (!utils::is_integer(split_space[1]))
+                else if (!Utils::is_integer(split_space[1]))
                     builder->glitch_error(
                             "Il comando 'stop' accetta solo un numero intero. Il tuo parametro: " +
                             split_space[1],
@@ -488,13 +508,13 @@ json quarantine_game::glitch_handler::check_for_action_errors(int32_t glitch, st
     }
 }
 
-vector<string> quarantine_game::glitch_handler::contains_player_reference(string message, uint8_t player_required) {
+vector<string> quarantine_game::GlitchHandler::contains_player_reference(string message, uint8_t player_required) {
     vector<string> res;
 
-    for(int i = 0; i < player_required; i++) {
+    for (int i = 0; i < player_required; i++) {
         string cnt = "<player_" + to_string(i + 1) + ">";
 
-        if(message.find(cnt) == string::npos) res.push_back("Giocatore" + to_string(i + 1));
+        if (message.find(cnt) == string::npos) res.push_back("Giocatore" + to_string(i + 1));
     }
 
     return res;

@@ -3,6 +3,9 @@
 //
 #include <string>
 #include <vector>
+#include <sstream>
+#include <fstream>
+#include <codecvt>
 
 #ifndef ELABORATO_ESAME_UTILS_H
 #define ELABORATO_ESAME_UTILS_H
@@ -13,7 +16,7 @@ namespace quarantine_game {
     /**
      * Class containing miscellaneous static methods.
      */
-    class utils {
+    class Utils {
     public:
         /**
         * Generates a pseudo-random 64-bit unsigned integer.
@@ -29,6 +32,8 @@ namespace quarantine_game {
          * @return the contents of the file. If it fails to find the file returns "not found".
          */
         static string read_file(const string &path_to_file) noexcept;
+
+        static wstring read_utf8_file(const string &path_to_file) noexcept;
 
         static uint8_t get_random_dice();
 

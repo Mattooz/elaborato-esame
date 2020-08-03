@@ -13,35 +13,35 @@ using namespace std;
 class glitch_suite;
 
 namespace quarantine_game {
-    class action {
+    class Action {
     private:
         vector<function<void()>> runnables;
     public:
-        action() = default;
+        Action() = default;
 
         void operator+(const function<void()> &runnable);
 
         void run();
     };
 
-    class glitch {
+    class Glitch {
     private:
-        friend class glitch_factory;
+        friend class GlitchFactory;
         friend class ::glitch_suite;
 
         string message;
         string title;
-        vector<player*> required;
-        vector<action> actions;
+        vector<weak_ptr<Player>> required;
+        vector<Action> actions;
         vector<string> buttons;
         uint8_t requires;
     public:
-        glitch(const string &message, const string &title, const vector<action> &actions, const vector<string> &buttons,
-                uint8_t requires);
+        Glitch(const string &message, const string &title, const vector<Action> &actions, const vector<string> &buttons,
+               uint8_t requires);
         const string &_message() const;
         const string &_title() const;
         const vector<string> &_buttons() const;
-        player* get_player() const;
+        weak_ptr<Player> get_player() const;
         const uint8_t action_count();
         void choose_action(uint8_t option);
 

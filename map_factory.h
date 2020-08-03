@@ -10,10 +10,10 @@ namespace quarantine_game {
     /**
      * Fetches the maps used in the game from .json files.
      */
-    class map_factory {
+    class MapFactory {
     private:
         static const string map_folder;
-        static vector<quarantine_game::map> cached;
+        static vector<quarantine_game::Map> cached;
     public:
 
         /**
@@ -22,7 +22,7 @@ namespace quarantine_game {
          * @param name the name of the map.
          * @return a map.
          */
-        static quarantine_game::map from_name(string name);
+        static quarantine_game::Map from_name(string name);
 
         /**
          * Gets a map from a given id. If no map is found it returns a "not-found" map.
@@ -30,7 +30,7 @@ namespace quarantine_game {
          * @param id the id of the map
          * @return a map.
          */
-        static quarantine_game::map from_id(string id);
+        static quarantine_game::Map from_id(string id);
 
         /**
          * Loads all the maps into memory if the cached map vector is empty, otherwise it will return the
@@ -38,7 +38,7 @@ namespace quarantine_game {
          *
          * @return a map vector.
          */
-        static vector<quarantine_game::map> map_list();
+        static vector<quarantine_game::Map> map_list();
     };
 }
 

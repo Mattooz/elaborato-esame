@@ -15,7 +15,7 @@ using json = nlohmann::json;
 
 namespace quarantine_game {
 
-    class player {
+    class Player {
     private:
         string name;
         double money;
@@ -27,9 +27,9 @@ namespace quarantine_game {
         bool has_quit;
         function<void()> quit;
     public:
-        player() = delete;
+        Player() = delete;
 
-        player(string name, double money, uint8_t position, function<void()> quit);
+        Player(string name, double money, uint8_t position, function<void()> quit);
 
         const string &_name() const;
 
@@ -51,8 +51,8 @@ namespace quarantine_game {
 
         json get_update();
 
-        bool operator!=(player p);
-        bool operator==(player p);
+        bool operator!=(Player p);
+        bool operator==(Player p);
     };
 
 }
