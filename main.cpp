@@ -1,15 +1,12 @@
-#include <iostream>
 #include "utils.h"
 #include "shortid.h"
 #include "glitch_handler.h"
 #include <vector>
 #include <string>
-#include <locale>
 #include <nlohmann/json.hpp>
 #include <server_http.hpp>
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <boost/locale.hpp>
 #include <spdlog/spdlog.h>
 #include "game.h"
 
@@ -26,7 +23,6 @@ using namespace quarantine_game;
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using json = nlohmann::json;
 using namespace boost;
-using namespace boost::locale;
 
 HttpServer server;
 vector <std::shared_ptr<Game>> games;
@@ -84,7 +80,7 @@ void setup_web_server() {
         json form = json::parse(request->content.string());
         string host = form["creator"];
         try {
-            Game g{host, 2000, "default-list", "default-Map"};
+            Game g{host, 2000, "default-list", "default-map"};
             g.get_player(host).lock()->add_update(g.create_default_update());
             games.push_back(make_shared<Game>(g));
             json res;
@@ -143,7 +139,7 @@ void setup_web_server() {
                         response->write(Game::not_ok_status.dump());
                     }
                     auto box = game->map()[player.lock()->_position()];
-                    auto cast = dynamic_pointer_cast<property_box>(box.lock());
+                    auto cast = dynamic_pointer_cast<PropertyBox>(box.lock());
 
                     if (cast) {
                         if (cast->_owner() == quarantine_game::Map::not_found) {
@@ -163,10 +159,7 @@ void setup_web_server() {
                     response->write(Game::ok_status.dump());
                 }
             } else if (type == "house") {
-                cout << "chosen house" << "\"" << name << "\" " << (game == nullptr) << endl;
                 IFELSE_LADDER else {
-                    cout << "past ladder" << endl;
-
 
                     string property;
                     string cnt;
@@ -176,11 +169,9 @@ void setup_web_server() {
 
                     auto count = stoi(cnt);
 
-                    cout << property << endl;
-
                     auto box = game->map()[property];
 
-                    auto cast = dynamic_pointer_cast<property_box>(box.lock());
+                    auto cast = dynamic_pointer_cast<PropertyBox>(box.lock());
 
                     if (cast->_owner() != game->get_player_turn(name))
                         response->write(Game::not_ok_status.dump());
@@ -268,7 +259,7 @@ void setup_web_server() {
             if (game != nullptr) {
                 auto cookies = parse_cookies(request->header);
                 if (!cookies["player_joined"].empty() && !cookies["player_name"].empty()) {
-                    response->write(Utils::read_file(web_pages + "/Game.html"));
+                    response->write(Utils::read_file(web_pages + "/game.html"));
                 } else response->write(Utils::read_file(web_pages + "/404.html"));
             } else response->write(Utils::read_file(web_pages + "/404.html"));
         } else response->write(Utils::read_file(web_pages + "/404.html"));

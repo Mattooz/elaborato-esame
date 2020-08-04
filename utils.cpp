@@ -48,7 +48,8 @@ uint8_t quarantine_game::Utils::get_random_dice() {
     mt19937 mt(rd());
     uniform_int_distribution<uint8_t> dist(1, 6);
 
-    return (uint8_t) dist(mt);
+    //return (uint8_t) dist(mt);
+    return 4;
 }
 
 uint32_t quarantine_game::Utils::get_random_num(uint32_t max) {

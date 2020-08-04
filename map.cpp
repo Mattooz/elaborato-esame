@@ -3,59 +3,61 @@
 //
 
 #include <iostream>
+#include <utility>
+#include <utility>
 #include "map.h"
 
 //TODO Add const not found
 
-string quarantine_game::Functional_Box::_type() {
+string quarantine_game::FunctionalBox::_type() {
     return type;
 }
 
-const uint8_t &quarantine_game::Functional_Box::_position() const {
+const uint8_t &quarantine_game::FunctionalBox::_position() const {
     return position;
 }
 
-quarantine_game::Functional_Box::Functional_Box(uint8_t position, const string &type) : Box(position), type(type) {}
+quarantine_game::FunctionalBox::FunctionalBox(uint8_t position, string type) : Box(position), type(std::move(type)) {}
 
-quarantine_game::Functional_Box::~Functional_Box() {}
+quarantine_game::FunctionalBox::~FunctionalBox() = default;
 
-const uint8_t &quarantine_game::property_box::_id() const {
+const uint8_t &quarantine_game::PropertyBox::_id() const {
     return id;
 }
 
-const int32_t &quarantine_game::property_box::_cost() const {
+const int32_t &quarantine_game::PropertyBox::_cost() const {
     return cost;
 }
 
-const string &quarantine_game::property_box::_name() const {
+const string &quarantine_game::PropertyBox::_name() const {
     return name;
 }
 
-uint8_t &quarantine_game::property_box::_owner() {
+uint8_t &quarantine_game::PropertyBox::_owner() {
     return owner;
 }
 
-uint8_t &quarantine_game::property_box::_houses() {
+uint8_t &quarantine_game::PropertyBox::_houses() {
     return houses;
 }
 
-const uint8_t &quarantine_game::property_box::_position() const {
+const uint8_t &quarantine_game::PropertyBox::_position() const {
     return position;
 }
 
-quarantine_game::property_box::property_box(uint8_t position, uint8_t id, int32_t cost, const string &name) : Box(
-        position), id(id), cost(cost), name(name) {
-    this->owner = map::not_found;
+quarantine_game::PropertyBox::PropertyBox(uint8_t position, uint8_t id, int32_t cost, string name) : Box(
+        position), id(id), cost(cost), name(std::move(name)) {
+    this->owner = Map::not_found;
     this->houses = 0;
 }
 
-quarantine_game::property_box::~property_box() {}
+quarantine_game::PropertyBox::~PropertyBox() = default;
 
 int32_t quarantine_game::Map::cost(uint8_t box) {
     auto a = this->operator[](box).lock();
 
     if (a) {
-        auto b = dynamic_pointer_cast<property_box>(a);
+        auto b = dynamic_pointer_cast<PropertyBox>(a);
         if (b) return b->_cost();
     }
     return -1;
@@ -65,7 +67,7 @@ string quarantine_game::Map::name(uint8_t pos) {
     auto a = this->operator[](pos).lock();
 
     if (a) {
-        auto b = dynamic_pointer_cast<property_box>(a);
+        auto b = dynamic_pointer_cast<PropertyBox>(a);
         if (b) return b->_name();
     }
     return "not found";
@@ -77,7 +79,7 @@ uint8_t quarantine_game::Map::id(uint8_t position) {
     for (auto it = boxes.begin(); it != boxes.end(); it++) {
         if ((*it)->_position() != position) continue;
 
-        auto property = dynamic_pointer_cast<property_box>(*it);
+        auto property = dynamic_pointer_cast<PropertyBox>(*it);
         if (property) return property->_id();
     }
     return Map::not_found;
@@ -85,7 +87,7 @@ uint8_t quarantine_game::Map::id(uint8_t position) {
 
 uint8_t quarantine_game::Map::pos(uint8_t id) {
     for (auto it = boxes.begin(); it != boxes.end(); it++) {
-        auto property = dynamic_pointer_cast<property_box>(*it);
+        auto property = dynamic_pointer_cast<PropertyBox>(*it);
         if (property && property->_id() == id) return property->_position();
     }
     return Map::not_found;
@@ -102,9 +104,9 @@ uint8_t quarantine_game::Map::distance_to_next_glitch(uint8_t pos) {
                 l = i;
         } else {
             if (boxes[i]->_position() == ((boxes[l]->_position() + distance) % boxes.size())) {
-                auto functional = dynamic_pointer_cast<Functional_Box>(b);
+                auto functional = dynamic_pointer_cast<FunctionalBox>(b);
 
-                if (functional && functional->_type() == "Glitch" && distance > 1) {
+                if (functional && functional->_type() == "glitch" && distance > 1) {
                     return distance;
                 }
 
@@ -122,9 +124,9 @@ bool quarantine_game::Map::is_glitch(uint8_t pos) {
     else {
         auto a = this->operator[](pos).lock();
         if (a) {
-            auto functional = dynamic_pointer_cast<Functional_Box>(a);
+            auto functional = dynamic_pointer_cast<FunctionalBox>(a);
 
-            if (functional && functional->_type() == "Glitch") return true;
+            if (functional && functional->_type() == "glitch") return true;
         }
     }
     return false;
@@ -141,7 +143,7 @@ uint8_t quarantine_game::Map::distance_to_prison(uint8_t pos) {
                 l = i;
         } else {
             if (boxes[i]->_position() == ((boxes[l]->_position() + distance) % boxes.size())) {
-                auto functional = dynamic_pointer_cast<Functional_Box>(b);
+                auto functional = dynamic_pointer_cast<FunctionalBox>(b);
 
                 if (functional && functional->_type() == "goto-prison" && distance > 1) {
                     return distance;
@@ -161,7 +163,7 @@ bool quarantine_game::Map::is_prison(uint8_t pos) {
     else {
         auto a = this->operator[](pos).lock();
         if (a) {
-            auto functional = dynamic_pointer_cast<Functional_Box>(a);
+            auto functional = dynamic_pointer_cast<FunctionalBox>(a);
 
             if (functional && functional->_type() == "goto-prison") return true;
         }
@@ -169,19 +171,19 @@ bool quarantine_game::Map::is_prison(uint8_t pos) {
     return false;
 }
 
-vector<weak_ptr<quarantine_game::property_box>> quarantine_game::Map::get_player_properties(uint8_t player) {
-    vector<weak_ptr<property_box>> res;
+vector<weak_ptr<quarantine_game::PropertyBox>> quarantine_game::Map::get_player_properties(uint8_t player) {
+    vector<weak_ptr<PropertyBox>> res;
 
     for (auto &box: boxes) {
-        auto property = dynamic_pointer_cast<property_box>(box);
-        if (property && property->_owner() == player) res.push_back(weak_ptr<property_box>(property));
+        auto property = dynamic_pointer_cast<PropertyBox>(box);
+        if (property && property->_owner() == player) res.push_back(weak_ptr<PropertyBox>(property));
     }
 
     return res;
 }
 
 void quarantine_game::Map::delete_player_properties(uint8_t player) {
-    vector<weak_ptr<property_box>> to_delete = get_player_properties(player);
+    vector<weak_ptr<PropertyBox>> to_delete = get_player_properties(player);
     for (auto &box: to_delete) {
         if (auto p = box.lock()) {
             p->_houses() = 0;
@@ -200,9 +202,9 @@ weak_ptr<quarantine_game::Box> quarantine_game::Map::operator[](uint8_t pos) {
     return {};
 }
 
-weak_ptr<quarantine_game::property_box> quarantine_game::Map::operator[](string name) {
+weak_ptr<quarantine_game::PropertyBox> quarantine_game::Map::operator[](const string& name) {
     for (auto &boxe : boxes) {
-        auto property = dynamic_pointer_cast<property_box>(boxe);
+        auto property = dynamic_pointer_cast<PropertyBox>(boxe);
         if (property) {
             if (property->_name() != name) continue;
             else return property;
@@ -211,9 +213,9 @@ weak_ptr<quarantine_game::property_box> quarantine_game::Map::operator[](string 
     return {};
 }
 
-weak_ptr<quarantine_game::property_box> quarantine_game::Map::from_id(uint8_t id) {
+weak_ptr<quarantine_game::PropertyBox> quarantine_game::Map::from_id(uint8_t id) {
     for (auto &boxe : boxes) {
-        auto property = dynamic_pointer_cast<property_box>(boxe);
+        auto property = dynamic_pointer_cast<PropertyBox>(boxe);
         if (property) {
             if (property->_id() != id) continue;
             else return property;
@@ -229,9 +231,9 @@ quarantine_game::Map::~Map() {
     boxes.clear();
 }
 
-quarantine_game::Map::Map(const vector<shared_ptr<Box>> &boxes, string map_name, string map_id) : boxes(boxes),
-                                                                                                  map_name(map_name),
-                                                                                                  map_id(map_id) {}
+quarantine_game::Map::Map(vector<shared_ptr<Box>> boxes, string map_name, string map_id) : boxes(std::move(boxes)),
+                                                                                           map_name(std::move(map_name)),
+                                                                                           map_id(std::move(map_id)) {}
 
 const string &quarantine_game::Map::_map_id() const {
     return map_id;

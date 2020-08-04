@@ -11,7 +11,7 @@ TEST(map_factory, test_from_name) {
     ASSERT_EQ(test._map_id(), "wWawlqCiQS61gCiy");
 
     ASSERT_EQ(test["Carraia"].lock()->_cost(), 260);
-    ASSERT_EQ(dynamic_pointer_cast<quarantine_game::property_box>(test[19].lock())->_name(), "Agliana");
+    ASSERT_EQ(dynamic_pointer_cast<quarantine_game::PropertyBox>(test[19].lock())->_name(), "Agliana");
 }
 
 TEST(map_factory, test_from_id) {
@@ -21,6 +21,6 @@ TEST(map_factory, test_from_id) {
     ASSERT_EQ(test._map_id(), "wWawlqCiQS61gCiy");
 
     ASSERT_EQ(test["Carraia"].lock()->_cost(), 260);
-    ASSERT_EQ(dynamic_pointer_cast<quarantine_game::property_box>(test[19].lock())->_name(), "Agliana");
+    ASSERT_EQ(dynamic_pointer_cast<quarantine_game::PropertyBox>(test[19].lock())->_name(), "Agliana");
 }
 

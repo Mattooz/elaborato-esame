@@ -9,8 +9,8 @@
 #ifndef ELABORATO_ESAME_GLITCH_HANDLER_H
 #define ELABORATO_ESAME_GLITCH_HANDLER_H
 
-#define LAMBDA_FUNCTION_DECL [&]()
-#define EMPTY_LAMBDA [&](){}
+#define LAMBDA_FUNCTION_DECL [=]()
+#define EMPTY_LAMBDA [=](){}
 
 class Glitch_factory_fixture;
 

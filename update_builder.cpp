@@ -105,6 +105,7 @@ quarantine_game::GameUpdateBuilder::new_glitch(string message, string title, vec
     json new_glitch_update;
 
     new_glitch_update["message"] = message;
+    new_glitch_update["title"] = title;
 
     for (int i = 0; i < buttons.size(); i++)
         new_glitch_update["button" + to_string(i)] = buttons[i];
@@ -168,7 +169,7 @@ quarantine_game::GlitchUpdateBuilder *
 quarantine_game::GlitchUpdateBuilder::glitch_error(string message, int32_t glitch) {
     json error;
 
-    error["Glitch"] = glitch;
+    error["glitch"] = glitch;
     error["message"] = message;
 
     if (!builder.contains("errors")) {
@@ -187,7 +188,7 @@ quarantine_game::GlitchUpdateBuilder *
 quarantine_game::GlitchUpdateBuilder::glitch_warning(string message, int32_t glitch) {
     json warning;
 
-    warning["Glitch"] = glitch;
+    warning["glitch"] = glitch;
     warning["message"] = message;
 
     if (!builder.contains("warnings")) {
@@ -206,7 +207,7 @@ quarantine_game::GlitchUpdateBuilder *
 quarantine_game::GlitchUpdateBuilder::glitch_success(string message, int32_t glitch) {
     json success;
 
-    success["Glitch"] = glitch;
+    success["glitch"] = glitch;
     success["message"] = message;
 
     if (!builder.contains("successes")) {

@@ -6,6 +6,7 @@
 #include "shortid.h"
 #include "utils.h"
 #include <spdlog/spdlog.h>
+#include <iostream>
 
 #include <utility>
 
@@ -164,11 +165,11 @@ void quarantine_game::Game::roll_dice(uint8_t player) {
             dice1 = utils::get_random_dice();
             dice2 = utils::get_random_dice();
 
-            auto f1 = [&](uint8_t p_turn, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant) -> json {
+            auto f1 = [=](uint8_t p_turn, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant) -> json {
                 return create_move_update(p_turn, dice1, dice2, new_pos, instant);
             };
 
-            auto f2 = [&](string name) -> uint8_t {
+            auto f2 = [=](string name) -> uint8_t {
                 return get_player_turn(name);
             };
 
@@ -239,7 +240,7 @@ void quarantine_game::Game::move_player(uint8_t p_turn, weak_ptr<quarantine_game
     auto a = game_map[ptr->_position()];
     if (a.expired()) throw exception();
     else {
-        auto b = dynamic_pointer_cast<property_box>(a.lock());
+        auto b = dynamic_pointer_cast<PropertyBox>(a.lock());
 
         if (b) {
             if (b->_owner() != 7 && b->_owner() != p_turn) {
@@ -266,11 +267,11 @@ void quarantine_game::Game::move_player(uint8_t p_turn, weak_ptr<quarantine_game
                 }
             }
         } else {
-            auto f1 = [&](uint8_t p_turn, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant) -> json {
+            auto f1 = [=](uint8_t p_turn, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant) -> json {
                 return create_move_update(p_turn, dice1, dice2, new_pos, instant);
             };
 
-            auto f2 = [&](string name) -> uint8_t {
+            auto f2 = [=](string name) -> uint8_t {
                 return get_player_turn(name);
             };
 
@@ -279,8 +280,12 @@ void quarantine_game::Game::move_player(uint8_t p_turn, weak_ptr<quarantine_game
                                                            f2};
 
             if (game_map.is_glitch(ptr->_position())) {
+                INFO("Player (name: " + ptr->_name() + ", turn: " + to_string(p_turn) +
+                     ") arrived on a glitch box.");
                 glitch = factory.glitch(p_turn, container);
             } else if (game_map.is_prison(ptr->_position())) {
+                INFO("Player (name: " + ptr->_name() + ", turn: " + to_string(p_turn) +
+                     ") arrived on a goto-prison box.");
                 ptr->_turns_in_prison() = 3;
                 glitch = factory.goto_prison(p_turn, container);
             }
@@ -317,8 +322,14 @@ void quarantine_game::Game::buy_property(uint8_t property, uint8_t player) {
             if (p->_position() == pro->_position()) {
                 if (p->_money() < pro->_cost()) {
                     /*TODO Add error updates to web-interface*/
+                    INFO("Player (name: " + p->_name() + ", turn: " + to_string(player) +
+                         ") failed to buy a property (name: " + pro->_name() + ", cost: " + to_string(pro->_cost()) +
+                         ", id: " + to_string(pro->_id()) + ", pos: " + to_string(pro->_position()) + ")");
 
                 } else {
+                    INFO("Player (name: " + p->_name() + ", turn: " + to_string(player) +
+                         ") just bought a property (name: " + pro->_name() + ", cost: " + to_string(pro->_cost()) +
+                         ", id: " + to_string(pro->_id()) + ", pos: " + to_string(pro->_position()) + ")");
                     p->_money() -= pro->_cost();
                     pro->_owner() = player;
                     send_to_all(create_color_update(property, player));
@@ -360,6 +371,10 @@ void quarantine_game::Game::buy_house(uint8_t p_turn, uint8_t property, int8_t h
                 }
                 send_to_all(create_house_count_update(property, house_count));
 
+                INFO("Player (name: " + p->_name() + ", turn: " + to_string(p_turn) +
+                     ") just bought or sold some houses (new_count: " + to_string(house_count) +
+                     ") on his property (name: " + a->_name() + ", cost: " + to_string(a->_cost()) +
+                     ", id: " + to_string(a->_id()) + ", pos: " + to_string(a->_position()) + ")");
             } else /*TODO Add error updates to web-interface*/ ;
         }
     }
@@ -536,6 +551,9 @@ json quarantine_game::Game::create_color_update(uint8_t property, uint8_t player
 
 json quarantine_game::Game::create_glitch_response_update(uint8_t option_chosen) {
     if (glitch._message() != "empty") {
+        INFO("Player (name: " + glitch.get_player().lock()->_name() + ", turn: " +
+             to_string(get_player_turn(glitch.get_player().lock()->_name())) + ") just chose action (" +
+             to_string(option_chosen) + ")");
         glitch.choose_action(option_chosen);
         glitch = GlitchFactory::empty_glitch();
 
@@ -597,7 +615,7 @@ json quarantine_game::Game::add_glitch_update(json update, string title) {
     return builder.res();
 }
 
-void quarantine_game::Game::send_to_all(const json& update) {
+void quarantine_game::Game::send_to_all(const json &update) {
     for (auto &player : players) {
         player->add_update(update);
     }

@@ -39,7 +39,7 @@ namespace quarantine_game {
     /**
      * Derived class from box. Used to represent the "glitch" and "prison" boxes.
      */
-    class Functional_Box : public Box {
+    class FunctionalBox : public Box {
     private:
         string type;
     public:
@@ -49,7 +49,7 @@ namespace quarantine_game {
          * @param position the position of the box.
          * @param type the type of the functional box. Can either be "glitch", "goto-prison", "prison" or "start".
          */
-        Functional_Box(uint8_t position, const string &type);
+        FunctionalBox(uint8_t position, string type);
 
         /**
          * @return the type of the box.
@@ -58,13 +58,13 @@ namespace quarantine_game {
 
         const uint8_t &_position() const override;
 
-        ~Functional_Box() override;
+        ~FunctionalBox() override;
     };
 
     /**
      * Derived class from box. Used to represent the property boxes on the map.
      */
-    class Property_Box : public Box {
+    class PropertyBox : public Box {
     private:
         uint8_t id;
         int32_t cost;
@@ -81,7 +81,7 @@ namespace quarantine_game {
          * @param cost the cost of the property.
          * @param name the name of the property.
          */
-        Property_Box(uint8_t position, uint8_t id, int32_t cost, const string &name);
+        PropertyBox(uint8_t position, uint8_t id, int32_t cost, string name);
 
         /**
          * @return the id of the box.
@@ -114,7 +114,7 @@ namespace quarantine_game {
 
         const uint8_t &_position() const override;
 
-        virtual ~Property_Box() override;
+        virtual ~PropertyBox() override;
     };
 
     /**
@@ -135,7 +135,7 @@ namespace quarantine_game {
          *
          * @param boxes a vector containing the boxes of the map.
          */
-        explicit Map(const vector<shared_ptr<Box>> &boxes, string map_name, string map_id);
+        explicit Map(vector<shared_ptr<Box>> boxes, string map_name, string map_id);
 
         const string &_map_name() const;
 
@@ -213,7 +213,7 @@ namespace quarantine_game {
          * @param player the id of the player
          * @return the properties of the player. If the player has no properties it will return an empty vector.
          */
-        vector<weak_ptr<Property_Box>> get_player_properties(uint8_t player);
+        vector<weak_ptr<PropertyBox>> get_player_properties(uint8_t player);
 
         /**
          * Deletes all the properties of a player
@@ -232,13 +232,13 @@ namespace quarantine_game {
          * @param name the name of the property.
          * @return a property box. If no box is found at the given name it returns nullptr.
          */
-        weak_ptr<Property_Box> operator[](string name);
+        weak_ptr<PropertyBox> operator[](const string& name);
 
         /**
          * @param id the id of the property.
          * @return a property box. If no box is found at the given id it returns nullptr.
          */
-        weak_ptr<Property_Box> from_id(uint8_t id);
+        weak_ptr<PropertyBox> from_id(uint8_t id);
 
         virtual ~Map();
     };

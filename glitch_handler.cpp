@@ -17,6 +17,7 @@
 #include <utility>
 
 #define ERROR(msg) spdlog::error(msg)
+#define INFO(msg) spdlog::info(msg)
 
 using namespace std::filesystem;
 
@@ -24,13 +25,14 @@ using namespace std::filesystem;
 quarantine_game::GlitchGameContainer::GlitchGameContainer(vector<weak_ptr<Player>> players, int8_t *redirectTo,
                                                           int8_t *canRollAgain,
                                                           function<json(uint8_t, uint8_t, uint8_t, uint8_t,
-                                                                            bool)> createMoveUpdate,
+                                                                        bool)> createMoveUpdate,
                                                           function<uint8_t(string)> getPlayerTurn) : players(
         std::move(players)), redirect_to(redirectTo), can_roll_again(canRollAgain), create_move_update(
         std::move(createMoveUpdate)), get_player_turn(std::move(getPlayerTurn)) {}
 
 quarantine_game::GlitchFactory::GlitchFactory(string glitch_list) : building(empty_glitch()),
-                                                                    glitches(GlitchHandler::from_name(std::move(glitch_list))),
+                                                                    glitches(GlitchHandler::from_name(
+                                                                            std::move(glitch_list))),
                                                                     previous(-1) {}
 
 quarantine_game::Glitch quarantine_game::GlitchFactory::empty_glitch() {
@@ -72,6 +74,8 @@ void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game
                         int32_t cost = abs((pla->_money() / 100) * rnd);
 
                         pla->_money() -= cost;
+                        INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                             to_string(state.get_player_turn(pla->_name())) + ") paid " + to_string(cost));
                     };
                     boost::replace_all(building.message, "<money>", to_string(rnd) + "%");
                 } else {
@@ -81,11 +85,17 @@ void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game
                             int32_t cost = abs(pla->_money() * percent);
 
                             pla->_money() += cost;
+                            INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                                 to_string(state.get_player_turn(pla->_name())) + ") paid " + to_string(cost * 100) +
+                                 "% of his money.");
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent) + "%");
                     } else {
                         ac + LAMBDA_FUNCTION_DECL {
                             pla->_money() += percent;
+
+                            INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                                 to_string(state.get_player_turn(pla->_name())) + ") paid " + to_string(percent));
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent));
                     }
@@ -98,6 +108,9 @@ void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game
                         int32_t cost = abs((pla->_money() / 100) * rnd);
 
                         pla->_money() += cost;
+
+                        INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                             to_string(state.get_player_turn(pla->_name())) + ") cashed-in " + to_string(cost));
                     };
                     boost::replace_all(building.message, "<money>", to_string(rnd) + "%");
                 } else {
@@ -107,35 +120,56 @@ void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game
                             int32_t cost = abs(pla->_money() * percent);
 
                             pla->_money() += cost;
+
+                            INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                                 to_string(state.get_player_turn(pla->_name())) + ") cashed-in " + to_string(cost));
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent) + "%");
                     } else {
                         ac + LAMBDA_FUNCTION_DECL {
                             pla->_money() += percent;
+
+                            INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                                 to_string(state.get_player_turn(pla->_name())) + ") cashed-in " + to_string(percent));
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent));
                     }
                 }
             } else if (c == "get-transaction") {
                 ac + LAMBDA_FUNCTION_DECL {
+                    INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                         to_string(state.get_player_turn(pla->_name())) +
+                         ") will get the money from any player transaction for one time");
                     *state.redirect_to = state.get_player_turn(pla->_name());
                 };
             } else if (c == "roll-again") {
                 ac + LAMBDA_FUNCTION_DECL {
+                    INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                         to_string(state.get_player_turn(pla->_name())) + ") will roll again");
                     *state.can_roll_again = state.get_player_turn(pla->_name());
                 };
             } else if (c == "avoid") {
                 int8_t avoid = stoi(split_space[1]);
                 ac + LAMBDA_FUNCTION_DECL {
+                    INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                         to_string(state.get_player_turn(pla->_name())) + ") will avoid any other glitches for " +
+                         to_string(avoid) + " rounds");
                     pla->_avoid() = avoid;
                 };
             } else if (c == "stop") {
                 int8_t stop = stoi(split_space[1]);
                 ac + LAMBDA_FUNCTION_DECL {
+                    INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                         to_string(state.get_player_turn(pla->_name())) + ") will be blocked for " +
+                         to_string(stop) + " rounds");
                     pla->_blocked_for() = stop;
                 };
             } else if (c == "ok") {
-                ac + LAMBDA_FUNCTION_DECL {};
+                ac + LAMBDA_FUNCTION_DECL {
+                    INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                         to_string(state.get_player_turn(pla->_name())) +
+                         ") pressed a button with 'ok' action. Nothing happened.");
+                };
             } else {
                 ERROR("Unknown command!");
                 ac + EMPTY_LAMBDA;
@@ -157,7 +191,7 @@ quarantine_game::GlitchFactory::glitch(uint8_t player, quarantine_game::GlitchGa
     building.requires = stoi(random_glitch["requires"].get<string>());
 
     auto p = state.players[player];
-    if (p.expired()) throw game_error("Error while creating Glitch! First Player pointer is expired.");
+    if (p.expired()) throw game_error("Error while creating glitch! First Player pointer is expired.");
 
     building.required.push_back(p);
 
@@ -167,12 +201,12 @@ quarantine_game::GlitchFactory::glitch(uint8_t player, quarantine_game::GlitchGa
         uint8_t rnd_pl = get_random_player(player, state);
 
         auto p1 = state.players[rnd_pl];
-        if (p1.expired()) throw game_error("Error while creating Glitch! Other Player pointer is expired.");
+        if (p1.expired()) throw game_error("Error while creating glitch! Other Player pointer is expired.");
 
         building.required.push_back(p1);
     }
 
-    parse_action(random_glitch["Action"], state);
+    parse_action(random_glitch["action"], state);
 
     for (auto &it : random_glitch["buttons"]) building.buttons.push_back(it);
 
@@ -189,7 +223,7 @@ quarantine_game::GlitchFactory::goto_prison(uint8_t player, quarantine_game::Gli
     ac + LAMBDA_FUNCTION_DECL {
         json update = state.create_move_update(player, 1, 1, 9, true);
         for (auto it : state.players) {
-            if (it.expired()) throw game_error("Error while creating goto_prison Glitch! Player pointer is null!");
+            if (it.expired()) throw game_error("Error while creating goto_prison glitch! Player pointer is null!");
             it.lock()->add_update(update);
         }
 
@@ -221,7 +255,7 @@ quarantine_game::GlitchFactory::get_random_player(uint8_t p_turn, quarantine_gam
 json quarantine_game::GlitchFactory::get_random_glitch(quarantine_game::GlitchGameContainer &state) {
     json res = glitches.at(get_random_num());
 
-    if (stoi(res["requires"].get<string>())> state.players.size()) return get_random_glitch(state);
+    if (stoi(res["requires"].get<string>()) > state.players.size()) return get_random_glitch(state);
     return res;
 }
 
@@ -272,9 +306,7 @@ vector<json> quarantine_game::GlitchHandler::lists() {
         wstring s = Utils::read_utf8_file(it.path());
 
         //Avoid annoying hidden os files. Took me so much time to figure this out...
-        if(it.path().stem().string() == ".DS_Store") continue;
-
-        wcout << s << endl;
+        if (it.path().stem().string() == ".DS_Store") continue;
 
         json read = json::parse(s);
 

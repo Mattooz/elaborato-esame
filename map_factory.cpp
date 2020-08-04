@@ -43,10 +43,10 @@ vector<quarantine_game::Map> quarantine_game::MapFactory::map_list() {
                 shared_ptr<Box> to_add;
 
                 if (it1.contains("id")) {
-                    to_add = make_shared<property_box>(
-                            property_box(it1["position"], it1["id"], it1["cost"], it1["name"]));
+                    to_add = make_shared<PropertyBox>(
+                            PropertyBox(it1["position"], it1["id"], it1["cost"], it1["name"]));
                 } else {
-                    to_add = make_shared<Functional_Box>(Functional_Box(it1["position"], it1["type"]));
+                    to_add = make_shared<FunctionalBox>(FunctionalBox(it1["position"], it1["type"]));
                 }
 
                 vec.push_back(to_add);
