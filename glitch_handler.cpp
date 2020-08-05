@@ -84,15 +84,15 @@ void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game
                         ac + LAMBDA_FUNCTION_DECL {
                             int32_t cost = abs(pla->_money() * percent);
 
-                            pla->_money() += cost;
+                            pla->_money() -= cost;
                             INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
-                                 to_string(state.get_player_turn(pla->_name())) + ") paid " + to_string(cost * 100) +
+                                 to_string(state.get_player_turn(pla->_name())) + ") paid " + to_string(percent * 100) +
                                  "% of his money.");
                         };
                         boost::replace_all(building.message, "<money>", to_string(percent) + "%");
                     } else {
                         ac + LAMBDA_FUNCTION_DECL {
-                            pla->_money() += percent;
+                            pla->_money() -= percent;
 
                             INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
                                  to_string(state.get_player_turn(pla->_name())) + ") paid " + to_string(percent));
@@ -171,8 +171,14 @@ void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game
                          ") pressed a button with 'ok' action. Nothing happened.");
                 };
             } else {
-                ERROR("Unknown command!");
-                ac + EMPTY_LAMBDA;
+                ERROR("Error while parsing action: unknown command! Parsing as 'ok' command.");
+                ac + LAMBDA_FUNCTION_DECL {
+                    INFO("GLITCH: Player (name: " + pla->_name() + ", turn: " +
+                         to_string(state.get_player_turn(pla->_name())) +
+                         ") pressed a button with unknown action type. Nothing happened.");
+                };
+
+                ac.unknown = true;
             }
         }
         building.actions.push_back(ac);
@@ -181,10 +187,16 @@ void quarantine_game::GlitchFactory::parse_action(string action, quarantine_game
 
 
 quarantine_game::Glitch
-quarantine_game::GlitchFactory::glitch(uint8_t player, quarantine_game::GlitchGameContainer &state) {
+quarantine_game::GlitchFactory::glitch(uint8_t player, quarantine_game::GlitchGameContainer &state,
+                                       int32_t which) {
     building = empty_glitch();
 
-    json random_glitch = get_random_glitch(state);
+    json random_glitch;
+
+    if (which == -1)
+        random_glitch = get_random_glitch(state);
+    else
+        random_glitch = get_glitch(which);
 
     building.message = random_glitch["message"];
     building.title = "IMPREVISTO";
@@ -228,6 +240,7 @@ quarantine_game::GlitchFactory::goto_prison(uint8_t player, quarantine_game::Gli
         }
 
         state.players[player].lock()->_position() = 9;
+        state.players[player].lock()->_turns_in_prison() = 3;
     };
 
     actions.push_back(ac);
@@ -266,6 +279,10 @@ uint32_t quarantine_game::GlitchFactory::get_random_num() {
     else previous = res;
 
     return res;
+}
+
+json quarantine_game::GlitchFactory::get_glitch(int32_t which) {
+    return glitches.at(which);
 }
 
 
@@ -376,8 +393,18 @@ json quarantine_game::GlitchHandler::check_for_errors(json to_check, quarantine_
         if (!a.contains("requires"))
             builder->glitch_error("In questo imprevisto non è presente il campo dei giocatori richiesti", i);
         else {
+
+            string s;
+
             try {
-                requires = a["requires"].get<int>();
+                s = a["requires"].get<string>();
+            } catch (exception &e) {
+                builder->glitch_error("Il campo dei giocatori richiesti non è un numero intero", i);
+                continue;
+            }
+
+            try {
+                requires = stoi(s);
             } catch (exception &e) {
                 builder->glitch_error("Il campo dei giocatori richiesti non è un numero intero", i);
                 continue;
@@ -400,7 +427,7 @@ json quarantine_game::GlitchHandler::check_for_errors(json to_check, quarantine_
             }
 
             if (message.empty()) {
-                builder->glitch_error("Il testo di questo imprevisto", i);
+                builder->glitch_error("Il testo di questo imprevisto è vuoto", i);
                 continue;
             }
         }
@@ -421,11 +448,11 @@ json quarantine_game::GlitchHandler::check_for_errors(json to_check, quarantine_
 
         if (!a.contains("buttons"))
             builder->glitch_error("Questo imprevisto non contiene la lista dei bottoni", i);
-        else if (!a.is_array())
+        else if (!a["buttons"].is_array())
             builder->glitch_error("La lista di bottoni di questo imprevisto è in un formato errato.", i);
         else {
             try {
-                for (auto b : a["buttons"]) {
+                for (const auto& b : a["buttons"]) {
                     if (b.get<string>().empty()) {
                         builder->glitch_error("Uno dei bottoni di questo imprevisto non ha testo.", i);
                     } else
@@ -437,11 +464,11 @@ json quarantine_game::GlitchHandler::check_for_errors(json to_check, quarantine_
             }
         }
 
-        if (!a.contains("Action"))
+        if (!a.contains("action"))
             builder->glitch_error("Questo imprevisto non contiene le azioni dei rispettivi bottoni", i);
         else {
             try {
-                action = a["Action"].get<string>();
+                action = a["action"].get<string>();
             } catch (exception &e) {
                 builder->glitch_error("Le azioni di questo imprevisto sono in un formato sconosciuto", i);
                 continue;
@@ -472,10 +499,12 @@ json quarantine_game::GlitchHandler::check_for_errors(json to_check, quarantine_
         }
 
     }
-    return nlohmann::json();
+    json js = builder->res();
+
+    return js;
 }
 
-json quarantine_game::GlitchHandler::check_for_action_errors(int32_t glitch, string action,
+void quarantine_game::GlitchHandler::check_for_action_errors(int32_t glitch, string action,
                                                              quarantine_game::GlitchUpdateBuilder *builder) {
 
     auto split_comma = Utils::split(action, ",");
@@ -534,7 +563,7 @@ json quarantine_game::GlitchHandler::check_for_action_errors(int32_t glitch, str
             } else if (c == "ok") {
                 //do nothing, nothing to check
             } else {
-                builder->glitch_error("Questo comando è sconosciuto.", glitch);
+                builder->glitch_error("Questo comando è sconosciuto: " + b, glitch);
             }
         }
     }

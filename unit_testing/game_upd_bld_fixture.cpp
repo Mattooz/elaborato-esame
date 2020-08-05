@@ -49,7 +49,7 @@ protected:
     vector<weak_ptr<Player>> players{{sp1}, {sp2}, {sp3}};
     bool hasStarted = true;
     uint32_t turns = 29;
-    quarantine_game::Map map = MapFactory::from_name("default-Map");
+    quarantine_game::Map map = MapFactory::from_name("default-map");
 
     UpdateGameContainer container{players, &turns, &hasStarted, &map};
 

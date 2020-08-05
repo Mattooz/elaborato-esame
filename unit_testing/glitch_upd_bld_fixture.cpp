@@ -27,6 +27,8 @@ protected:
 
 TEST_F(glitch_upd_bld_suite, test_result_json) {
     ASSERT_EQ(builder1->res().dump(), correct_json_glitch_update);
+    
+    delete builder1;
 }
 
 

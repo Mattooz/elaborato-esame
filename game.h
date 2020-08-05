@@ -12,7 +12,7 @@
 using json = nlohmann::json;
 using namespace std;
 
-class Glitch_factory_fixture;
+class Glitch_factory_suite;
 
 namespace quarantine_game {
 
@@ -35,7 +35,7 @@ namespace quarantine_game {
         Glitch glitch;
         quarantine_game::Map game_map;
 
-        friend class ::Glitch_factory_fixture;
+        friend class ::Glitch_factory_suite;
 
     public:
         Game(const string& host, double starting_money, string glitch_list, string map_name);

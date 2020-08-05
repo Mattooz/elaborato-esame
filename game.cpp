@@ -481,11 +481,11 @@ json quarantine_game::Game::create_default_update() {
 
 quarantine_game::GlitchGameContainer quarantine_game::Game::get_game_container() {
 
-    auto f1 = [&](uint8_t p_turn, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant) -> json {
+    auto f1 = [=](uint8_t p_turn, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant) -> json {
         return create_move_update(p_turn, dice1, dice2, new_pos, instant);
     };
 
-    auto f2 = [&](string name) -> uint8_t {
+    auto f2 = [=](string name) -> uint8_t {
         return get_player_turn(name);
     };
 

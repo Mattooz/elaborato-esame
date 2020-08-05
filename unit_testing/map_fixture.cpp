@@ -14,10 +14,10 @@ protected:
     shared_ptr<Box> box2{new PropertyBox(1, 0, 50, "test-1")};
     shared_ptr<Box> box3{new PropertyBox(2, 1, 50, "test-2")};
     shared_ptr<Box> box4{new PropertyBox(3, 2, 50, "test-3")};
-    shared_ptr<Box> box5{new FunctionalBox(4, "Glitch")};
+    shared_ptr<Box> box5{new FunctionalBox(4, "glitch")};
     shared_ptr<Box> box6{new PropertyBox(5, 3, 50, "test-4")};
     shared_ptr<Box> box7{new PropertyBox(6, 4, 50, "test-5")};
-    shared_ptr<Box> box8{new FunctionalBox(7, "Glitch")};
+    shared_ptr<Box> box8{new FunctionalBox(7, "glitch")};
     shared_ptr<Box> box9{new PropertyBox(8, 5, 50, "test-6")};
     shared_ptr<Box> box10{new PropertyBox(9, 6, 50, "test-7")};
     shared_ptr<Box> box11{new FunctionalBox(10, "goto-prison")};

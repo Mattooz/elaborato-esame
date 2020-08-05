@@ -12,7 +12,7 @@
 #define LAMBDA_FUNCTION_DECL [=]()
 #define EMPTY_LAMBDA [=](){}
 
-class Glitch_factory_fixture;
+class Glitch_factory_suite;
 
 namespace quarantine_game {
     struct GlitchGameContainer {
@@ -45,31 +45,33 @@ namespace quarantine_game {
 
         static json check_for_errors(json to_check, GlitchUpdateBuilder *builder);
 
-        static json check_for_action_errors(int32_t glitch, string action, GlitchUpdateBuilder *builder);
+        static void check_for_action_errors(int32_t glitch, string action, GlitchUpdateBuilder *builder);
 
         static vector<string> contains_player_reference(string message, uint8_t player_required);
     };
 
     class GlitchFactory {
     private:
+        friend class ::Glitch_factory_suite;
+
         json glitches;
         int32_t previous;
         Glitch building;
 
         void parse_action(string action, GlitchGameContainer &state);
         uint8_t get_random_player(uint8_t p_turn, quarantine_game::GlitchGameContainer &state);
-        json get_random_glitch(GlitchGameContainer & state);
+        json get_random_glitch(GlitchGameContainer &state);
+        json get_glitch(int32_t which);
         uint32_t get_random_num();
 
-        friend class ::Glitch_factory_fixture;
     public:
         explicit GlitchFactory(string glitch_list);
 
-        Glitch glitch(uint8_t player, GlitchGameContainer &state);
+        Glitch glitch(uint8_t player, GlitchGameContainer &state, int32_t which = -1);
+
         class Glitch goto_prison(uint8_t player, GlitchGameContainer &state);
+
         static class Glitch empty_glitch();
-
-
     };
 }
 

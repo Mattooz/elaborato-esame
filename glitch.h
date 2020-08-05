@@ -11,13 +11,16 @@
 using namespace std;
 
 class glitch_suite;
+class Glitch_factory_suite;
 
 namespace quarantine_game {
     class Action {
     private:
         vector<function<void()>> runnables;
     public:
-        Action() = default;
+        bool unknown;
+
+        Action() : unknown(false) {};
 
         void operator+(const function<void()> &runnable);
 
@@ -28,6 +31,7 @@ namespace quarantine_game {
     private:
         friend class GlitchFactory;
         friend class ::glitch_suite;
+        friend class ::Glitch_factory_suite;
 
         string message;
         string title;

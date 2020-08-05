@@ -1,0 +1,328 @@
+{
+  "1": {
+    "name": "",
+    "password": "",
+    "glitches": "not right"
+  },
+  "2": {
+    "password": ""
+  },
+  "3": {
+    "name": 1,
+    "password": ""
+  },
+  "4": {
+    "name": "bad",
+    "password": "",
+    "glitches": [
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      }
+    ]
+  },
+  "5": {
+    "name": "bad",
+    "password": "",
+    "glitches": [
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      }
+    ]
+  },
+  "6": {
+    "name": "bad",
+    "password": "",
+    "glitches": [
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": {}
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "eie",
+        "requires": 1
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": 22,
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "2"
+      },
+      {
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": "button",
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          {
+            "not-a": "button"
+          }
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          ""
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": {
+          "not-an": "action"
+        },
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "action-button",
+          "number discrepancy"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "too",
+          "many",
+          "buttons"
+        ],
+        "action": "ok, ok, ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "pay rnd",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "ok",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "pay not good",
+        "message": "test <money>",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "pay",
+        "message": "test <money>",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "pay bad",
+        "message": "test <money>",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "cash-in not good",
+        "message": "test <money>",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "cash-in",
+        "message": "test <money>",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "cash-in bad",
+        "message": "test <money>",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "avoid bad",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "stop bad",
+        "message": "test",
+        "requires": "1"
+      },
+      {
+        "buttons": [
+          "nome"
+        ],
+        "action": "unknown-action",
+        "message": "test",
+        "requires": "1"
+      }
+    ]
+  }
+}
