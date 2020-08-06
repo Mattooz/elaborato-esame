@@ -57,7 +57,7 @@ protected:
 };
 
 TEST_F(game_upd_bld_suite, test_result_json) {
-    ASSERT_EQ(builder1->res().dump(), correct_json_game_update);
+    ASSERT_EQ(builder1->res(), json::parse(correct_json_game_update));
 
     delete builder1;
 }

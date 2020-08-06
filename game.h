@@ -21,10 +21,8 @@ namespace quarantine_game {
      */
     class Game {
     private:
-        const static uint8_t not_found = 0xFF;
         int8_t can_roll_again;
         int8_t redirect_to;
-        bool goto_prison;
         string id;
         double starting_money;
         uint32_t turns;
@@ -34,10 +32,12 @@ namespace quarantine_game {
         GlitchFactory factory;
         Glitch glitch;
         quarantine_game::Map game_map;
-
         friend class ::Glitch_factory_suite;
 
     public:
+        bool goto_prison;
+        const static uint8_t not_found;
+
         Game(const string& host, double starting_money, string glitch_list, string map_name);
 
         /**
@@ -79,6 +79,14 @@ namespace quarantine_game {
          * @return true or false
          */
         const bool full() const;
+
+        /**
+         *
+         */
+        const Glitch& current_glitch() const;
+
+        int8_t& redirect();
+        int8_t& roll_again();
 
         /**
          * Returns the current amount of players present in the game.

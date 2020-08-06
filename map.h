@@ -128,7 +128,7 @@ namespace quarantine_game {
         string map_id;
         vector<shared_ptr<Box>> boxes;
     public:
-        const static uint8_t not_found = 0xFF;
+        const static uint8_t not_found;
 
         /**
          * Constructor for the map class.
@@ -239,6 +239,11 @@ namespace quarantine_game {
          * @return a property box. If no box is found at the given id it returns nullptr.
          */
         weak_ptr<PropertyBox> from_id(uint8_t id);
+
+        /**
+         *
+         */
+        void reset();
 
         virtual ~Map();
     };

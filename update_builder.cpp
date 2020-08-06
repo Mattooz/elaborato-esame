@@ -68,7 +68,7 @@ quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::color(ui
     json update_property_color;
 
     update_property_color["pos"] = property;
-    update_property_color["Player"] = player;
+    update_property_color["player"] = player;
 
     if (!builder.contains("updatePropertyColor")) {
         json array = json::array();

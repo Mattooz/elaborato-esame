@@ -14,6 +14,7 @@
 
 const nlohmann::json quarantine_game::Game::not_ok_status = {{"ok", false}};
 const nlohmann::json quarantine_game::Game::ok_status = {{"ok", true}};
+const uint8_t quarantine_game::Game::not_found = 0xFF;
 
 quarantine_game::Game::Game(const string &host, double starting_money, string glitch_list, string map_name)
         : starting_money(
@@ -54,6 +55,17 @@ const bool quarantine_game::Game::full() const {
     return players.size() == 6;
 }
 
+const quarantine_game::Glitch &quarantine_game::Game::current_glitch() const {
+    return glitch;
+}
+
+int8_t &quarantine_game::Game::redirect() {
+    return redirect_to;
+}
+
+int8_t &quarantine_game::Game::roll_again() {
+    return can_roll_again;
+}
 
 quarantine_game::Map &quarantine_game::Game::map() {
     return game_map;
@@ -121,12 +133,14 @@ bool quarantine_game::Game::is_property_owned(uint8_t property) {
 
 void quarantine_game::Game::roll_dice(uint8_t player) {
     using utils = quarantine_game::Utils;
-    if (turns % players.size() == player) {
+    if (turns % players.size() == player && has_started) {
         auto point = get_player(player);
 
         if (point.expired()) throw game_error("Error while rolling dice. Player pointer is expired!");
 
         auto p = point.lock();
+
+        if (p->_blocked_for() > 0) return;
 
         uint8_t previous = p->_position() + 0;
 
@@ -177,7 +191,7 @@ void quarantine_game::Game::roll_dice(uint8_t player) {
                                                            &can_roll_again, f1,
                                                            f2};
 
-            if (dice1 != dice2 && p->_turns_in_prison() != 0) {
+            if (dice1 != dice2 && p->_turns_in_prison() > 0) {
                 glitch = factory.glitch(player, container);
 
                 p->_turns_in_prison() = p->_turns_in_prison() - 1;
@@ -185,13 +199,18 @@ void quarantine_game::Game::roll_dice(uint8_t player) {
                 json update = create_default_update();
                 update["dice1"] = dice1;
                 update["dice2"] = dice2;
+
+                for (auto &a : players) {
+                    if (glitch.get_player().lock()->_name() != a->_name())
+                        a->add_update(update);
+                }
+
                 update = add_glitch_update(update);
 
                 p->add_update(update);
 
                 INFO("Player (name: " + p->_name() + ", turn: " + to_string(player) +
                      ") failed to escape prison. Dices: " + to_string(dice1) + ", " + to_string(dice2));
-                move_player(player, p, dice1, dice2);
             } else {
                 INFO("Player (name: " + p->_name() + ", turn: " + to_string(player) +
                      ") escaped prison and moved to pos " + to_string(p->_position()) + " (from: " +
@@ -208,7 +227,7 @@ void quarantine_game::Game::next_player(uint8_t p_turn) {
     if (p.expired()) throw game_error("Error while advancing Player! Player pointer is expired!");
     auto player = p.lock();
 
-    if (turns % players.size() != p_turn) return;
+    if (turns % players.size() != p_turn || !has_started) return;
 
     if (!get_offline_player(player->_name()).expired() || player->_blocked_for() > 0) {
         turns += 2;
@@ -232,6 +251,7 @@ void quarantine_game::Game::move_player(uint8_t p_turn, const weak_ptr<quarantin
 void quarantine_game::Game::move_player(uint8_t p_turn, weak_ptr<quarantine_game::Player> player, uint8_t dice1,
                                         uint8_t dice2,
                                         uint8_t new_pos, bool instant) {
+    if (turns % players.size() != p_turn || !has_started) return;
     if (player.expired()) throw game_error("Error while moving Player! Player pointer is expired!");
     auto ptr = player.lock();
 
@@ -262,6 +282,7 @@ void quarantine_game::Game::move_player(uint8_t p_turn, weak_ptr<quarantine_game
                     auto redirect = get_player(redirect_to);
                     if (redirect.expired())
                         throw game_error("Error while transferring money! Redirect-to Player pointer is expired!");
+                    ptr->_money() -= cost;
                     redirect.lock()->_money() += cost;
                     redirect_to = -1;
                 }
@@ -280,9 +301,17 @@ void quarantine_game::Game::move_player(uint8_t p_turn, weak_ptr<quarantine_game
                                                            f2};
 
             if (game_map.is_glitch(ptr->_position())) {
-                INFO("Player (name: " + ptr->_name() + ", turn: " + to_string(p_turn) +
-                     ") arrived on a glitch box.");
-                glitch = factory.glitch(p_turn, container);
+
+                if (ptr->_avoid() <= 0) {
+                    glitch = factory.glitch(p_turn, container);
+                    INFO("Player (name: " + ptr->_name() + ", turn: " + to_string(p_turn) +
+                         ") arrived on a glitch box.");
+                } else {
+                    ptr->_avoid() -= 1;
+                    INFO("Player (name: " + ptr->_name() + ", turn: " + to_string(p_turn) +
+                         ") arrived on a glitch box but he is a lucky boy. Remaining avoid: " +
+                         to_string(ptr->_avoid()));
+                }
             } else if (game_map.is_prison(ptr->_position())) {
                 INFO("Player (name: " + ptr->_name() + ", turn: " + to_string(p_turn) +
                      ") arrived on a goto-prison box.");
@@ -310,7 +339,7 @@ void quarantine_game::Game::move_player(uint8_t p_turn, weak_ptr<quarantine_game
 }
 
 void quarantine_game::Game::buy_property(uint8_t property, uint8_t player) {
-    if (turns % players.size() == player) {
+    if (turns % players.size() == player && has_started) {
         auto pl = get_player(player);
         auto pr = game_map.from_id(property);
 
@@ -321,7 +350,6 @@ void quarantine_game::Game::buy_property(uint8_t property, uint8_t player) {
             auto pro = pr.lock();
             if (p->_position() == pro->_position()) {
                 if (p->_money() < pro->_cost()) {
-                    /*TODO Add error updates to web-interface*/
                     INFO("Player (name: " + p->_name() + ", turn: " + to_string(player) +
                          ") failed to buy a property (name: " + pro->_name() + ", cost: " + to_string(pro->_cost()) +
                          ", id: " + to_string(pro->_id()) + ", pos: " + to_string(pro->_position()) + ")");
@@ -334,7 +362,7 @@ void quarantine_game::Game::buy_property(uint8_t property, uint8_t player) {
                     pro->_owner() = player;
                     send_to_all(create_color_update(property, player));
                 }
-            } else /*TODO Add error updates to web-interface*/;
+            }
         }
     }
 }
@@ -345,7 +373,7 @@ void quarantine_game::Game::buy_property(uint8_t property, string player) {
 }
 
 void quarantine_game::Game::buy_house(uint8_t p_turn, uint8_t property, int8_t house_count) {
-    if (turns % players.size() == p_turn) {
+    if (turns % players.size() == p_turn && has_started) {
         auto pl = get_player(p_turn);
         auto box = game_map.from_id(property);
 
@@ -371,21 +399,26 @@ void quarantine_game::Game::buy_house(uint8_t p_turn, uint8_t property, int8_t h
                 }
                 send_to_all(create_house_count_update(property, house_count));
 
+
                 INFO("Player (name: " + p->_name() + ", turn: " + to_string(p_turn) +
                      ") just bought or sold some houses (new_count: " + to_string(house_count) +
                      ") on his property (name: " + a->_name() + ", cost: " + to_string(a->_cost()) +
                      ", id: " + to_string(a->_id()) + ", pos: " + to_string(a->_position()) + ")");
-            } else /*TODO Add error updates to web-interface*/ ;
+            }
         }
     }
 }
 
 void quarantine_game::Game::player_quit(uint8_t player) {
+    auto properties = game_map.get_player_properties(player);
+
     remove_player(player);
 
-    auto properties = game_map.get_player_properties(player);
-    std::map<uint8_t, uint8_t> to_old_format;
+    if(turns % players.size() == player && has_started) {
+        next_player(player);
+    }
 
+    std::map<uint8_t, uint8_t> to_old_format;
 
     for (auto &it : properties) {
         if (it.expired()) throw game_error("Error while Player is quitting! Property pointer is expired!");
@@ -412,6 +445,7 @@ void quarantine_game::Game::remove_player(uint8_t player) {
         if (has_started) {
             game_map.delete_player_properties(player);
 
+
             offline_players.push_back(p);
         } else {
             players.erase(players.begin() + player);
@@ -420,10 +454,15 @@ void quarantine_game::Game::remove_player(uint8_t player) {
 }
 
 void quarantine_game::Game::player_rejoin(string player) {
+    if(!has_started) return;
+
     for (int i = 0; i < offline_players.size(); i++) {
         auto p = offline_players[i];
         if (p.expired()) throw game_error("Error while Player is rejoining! Offline Player pointer is expired!");
-        if (p.lock()->_name() == player) offline_players.erase(offline_players.begin() + i);
+        if (p.lock()->_name() == player) {
+            offline_players.erase(offline_players.begin() + i);
+            break;
+        }
     }
 
     GameUpdateBuilder builder{{get_players(), &turns, &has_started, &game_map}};
@@ -439,7 +478,7 @@ void quarantine_game::Game::player_rejoin(string player) {
         auto properties = game_map.get_player_properties(i);
 
         for (auto &it : properties) {
-            if (it.expired()) throw exception();
+            if (it.expired()) throw game_error("Property pointer expired while player is rejoining!");
             else {
                 auto a = it.lock();
                 builder.house_count(a->_id(), a->_houses());
@@ -451,7 +490,8 @@ void quarantine_game::Game::player_rejoin(string player) {
     builder.other("hasStarted", has_started);
 
     auto pl = get_player(player);
-    if (pl.expired()) game_error("Error while Player is rejoining! Player pointer is expired!");
+    if (pl.expired()) throw game_error("Error while Player is rejoining! Player pointer is expired!");
+    pl.lock()->delete_updates();
     pl.lock()->add_update(builder.res());
 
     builder1.other("playerRejoined", ((uint64_t) get_player_turn(player)));

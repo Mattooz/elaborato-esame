@@ -125,7 +125,11 @@ TEST_F(Glitch_factory_suite, test_valid_cashin_rnd_glitch) {
 
     b.choose_action(0);
 
-    ASSERT_GT(b.get_player().lock()->_money(), 2000);
+    /*
+     * The random amount of money can go from 0 to 50%. If it is 0 then
+     * the amount of money won't change.
+     */
+    EXPECT_GE(b.get_player().lock()->_money(), 2000);
 }
 
 TEST_F(Glitch_factory_suite, test_valid_blocked_and_pay_rnd_glitch) {
@@ -167,7 +171,7 @@ TEST_F(Glitch_factory_suite, test_goto_prison) {
 }
 
 TEST_F(Glitch_factory_suite, test_empty_glitch) {
-    auto a = factory.empty_glitch();
+    auto a = quarantine_game::GlitchFactory::empty_glitch();
 
     ASSERT_EQ(a._title(), "empty");
     ASSERT_EQ(a._message(), "empty");

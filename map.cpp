@@ -45,6 +45,8 @@ const uint8_t &quarantine_game::PropertyBox::_position() const {
     return position;
 }
 
+const uint8_t quarantine_game::Map::not_found = 0xFF;
+
 quarantine_game::PropertyBox::PropertyBox(uint8_t position, uint8_t id, int32_t cost, string name) : Box(
         position), id(id), cost(cost), name(std::move(name)) {
     this->owner = Map::not_found;
@@ -245,6 +247,16 @@ const string &quarantine_game::Map::_map_name() const {
 
 const uint32_t quarantine_game::Map::box_count() const {
     return boxes.size();
+}
+
+void quarantine_game::Map::reset() {
+    for(auto &boxe : boxes) {
+        auto property = dynamic_pointer_cast<PropertyBox>(boxe);
+        if(property) {
+            property->_houses() = 0;
+            property->_owner() = Map::not_found;
+        }
+    }
 }
 
 
