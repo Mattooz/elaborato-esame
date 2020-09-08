@@ -3,7 +3,7 @@
 #include <iostream>
 #include "../utils.h"
 
-using namespace quarantine_game;
+using namespace QuarantineGame;
 
 /*
  * Correct json output generated with the Java version of the builder.

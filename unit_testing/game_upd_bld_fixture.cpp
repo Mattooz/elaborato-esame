@@ -5,7 +5,7 @@
 #include <string>
 #include <gtest/gtest.h>
 
-using namespace quarantine_game;
+using namespace QuarantineGame;
 using namespace std;
 
 /*
@@ -19,9 +19,9 @@ protected:
     game_upd_bld_suite() {}
 
     virtual void SetUp() {
-        map["Ponticello"].lock()->_owner() = 1;
-        map["Carraia"].lock()->_owner() = 0;
-        map["Barcellona"].lock()->_owner() = 2;
+        map["Ponticello"]->_owner() = 1;
+        map["Carraia"]->_owner() = 0;
+        map["Barcellona"]->_owner() = 2;
 
         builder1->start()
                 ->move(4, 5, 9, 1, false)
@@ -46,10 +46,10 @@ protected:
     shared_ptr<Player> sp2 = make_shared<Player> (p2);
     shared_ptr<Player> sp3 = make_shared<Player> (p3);
 
-    vector<weak_ptr<Player>> players{{sp1}, {sp2}, {sp3}};
+    vector<shared_ptr<Player>> players{{sp1}, {sp2}, {sp3}};
     bool hasStarted = true;
     uint32_t turns = 29;
-    quarantine_game::Map map = MapFactory::from_name("default-map");
+    QuarantineGame::Map map = MapFactory::from_name("default-map");
 
     UpdateGameContainer container{players, &turns, &hasStarted, &map};
 

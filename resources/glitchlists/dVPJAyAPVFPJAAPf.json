@@ -1,0 +1,195 @@
+{
+  "password": "ec7b54a5b113d29fbde39bab348852d9cf2325b628bfbbffd72e53ceeecdda93",
+  "name": "default-list",
+  "glitches": [
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 0 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 1 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "roll-again",
+      "message": "Testo omesso. Imprevisto 2 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 3 con unica azione 'ok'",
+      "requires": "2"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 4 con unica azione 'ok'",
+      "requires": "2"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 5 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 6 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": [
+        "primo bottone",
+        "secondo bottone"
+      ],
+      "action": "ok, ok",
+      "message": "Testo omesso. Imprevisto 7 con doppia azione 'ok'",
+      "requires": "2"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 8 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": [
+        "primo bottone",
+        "secondo bottone"
+      ],
+      "action": "pay rnd, ok",
+      "message": "Testo omesso. Imprevisto 9 con doppia azione 'pay rnd' e 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 10 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 11 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 12 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": [
+        "primo bottone",
+        "secondo bottone"
+      ],
+      "action": "ok, ok",
+      "message": "Testo omesso. Imprevisto 13 con doppia azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 14 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "pay 0.1",
+      "message": "Testo omesso. Imprevisto 15 con unica azione 'pay 0.1'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "stop 3 and pay rnd",
+      "message": "Testo omesso. Imprevisto 16 con unica azione 'stop 3 and pay rnd'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "get-transaction ",
+      "message": "Testo omesso. Imprevisto 17 con unica azione 'get-transaction'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["si sbanca"],
+      "action": "cash-in 0.1",
+      "message": "Testo omesso. Imprevisto 18 con unica azione 'cash-in 0.1'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "pay rnd",
+      "message": "Testo omesso. Imprevisto 19 con unica azione 'pay rnd'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "pay rnd",
+      "message": "Testo omesso. Imprevisto 20 con unica azione 'pay rnd'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "cash-in rnd",
+      "message": "Testo omesso. Imprevisto 21 con unica azione 'cash-in rnd'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 22 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 23 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "stop 1",
+      "message": "Testo omesso. Imprevisto 24 con unica azione 'stop 1'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 25 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 26 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 27 con unica azione 'ok'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "pay rnd",
+      "message": "Testo omesso. Imprevisto 28 con unica azione 'pay rnd'",
+      "requires": "1"
+    },
+    {
+      "buttons": ["primo bottone"],
+      "action": "ok",
+      "message": "Testo omesso. Imprevisto 29 con unica azione 'ok'",
+      "requires": "1"
+    }
+  ]
+}

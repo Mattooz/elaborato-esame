@@ -1,17 +1,16 @@
 #include "update_builder.h"
 #include "utils.h"
 
-quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::start() {
+QuarantineGame::GameUpdateBuilder *QuarantineGame::GameUpdateBuilder::start() {
     builder["isNew"] = true;
     builder["playerCount"] = container.players.size();
 
     json player_list;
 
     for (int i = 0; i < container.players.size(); i++) {
-        auto p = container.players[i];
-        if(p.expired()) throw game_error("Error while creating update! Player pointer is expired!");
+        auto pl = container.players[i];
+        if(!pl) throw game_error("Error while creating update! Player pointer is expired!");
         json player_details;
-        auto pl = p.lock();
 
         player_details["name"] = pl->_name();
         player_details["money"] = pl->_money();
@@ -23,11 +22,11 @@ quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::start() 
         json properties = json::array();
 
         for (auto &it : prp) {
-            if (it.expired())
-                throw quarantine_game::game_error(
+            if (!it)
+                throw QuarantineGame::game_error(
                         "Error while creating 'property_list' field. Box property expired.");
 
-            properties.push_back(it.lock()->_name());
+            properties.push_back(it->_name());
         }
 
         player_details["property_list"] = properties;
@@ -41,9 +40,9 @@ quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::start() 
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *
-quarantine_game::GameUpdateBuilder::move(uint8_t dice1, uint8_t dice2, int8_t new_pos, uint8_t player,
-                                         bool instant) {
+QuarantineGame::GameUpdateBuilder *
+QuarantineGame::GameUpdateBuilder::move(uint8_t dice1, uint8_t dice2, int8_t new_pos, uint8_t player,
+                                        bool instant) {
     json update_player_pos;
 
     update_player_pos["dice1"] = dice1;
@@ -64,7 +63,7 @@ quarantine_game::GameUpdateBuilder::move(uint8_t dice1, uint8_t dice2, int8_t ne
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::color(uint8_t property, uint8_t player) {
+QuarantineGame::GameUpdateBuilder *QuarantineGame::GameUpdateBuilder::color(uint8_t property, uint8_t player) {
     json update_property_color;
 
     update_property_color["pos"] = property;
@@ -82,8 +81,8 @@ quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::color(ui
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *
-quarantine_game::GameUpdateBuilder::house_count(uint8_t property, uint8_t house_count) {
+QuarantineGame::GameUpdateBuilder *
+QuarantineGame::GameUpdateBuilder::house_count(uint8_t property, uint8_t house_count) {
     json update_house_count;
 
     update_house_count["pos"] = property;
@@ -100,8 +99,8 @@ quarantine_game::GameUpdateBuilder::house_count(uint8_t property, uint8_t house_
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *
-quarantine_game::GameUpdateBuilder::new_glitch(string message, string title, vector<string> buttons) {
+QuarantineGame::GameUpdateBuilder *
+QuarantineGame::GameUpdateBuilder::new_glitch(string message, string title, vector<string> buttons) {
     json new_glitch_update;
 
     new_glitch_update["message"] = message;
@@ -118,8 +117,8 @@ quarantine_game::GameUpdateBuilder::new_glitch(string message, string title, vec
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *
-quarantine_game::GameUpdateBuilder::quit(uint8_t player_quit, uint8_t player_to) {
+QuarantineGame::GameUpdateBuilder *
+QuarantineGame::GameUpdateBuilder::quit(uint8_t player_quit, uint8_t player_to) {
     json player_quit_up;
 
     if (*container.has_started) {
@@ -135,38 +134,38 @@ quarantine_game::GameUpdateBuilder::quit(uint8_t player_quit, uint8_t player_to)
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::other(string key, string value) {
+QuarantineGame::GameUpdateBuilder *QuarantineGame::GameUpdateBuilder::other(string key, string value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::other(string key, bool value) {
+QuarantineGame::GameUpdateBuilder *QuarantineGame::GameUpdateBuilder::other(string key, bool value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::other(string key, uint64_t value) {
+QuarantineGame::GameUpdateBuilder *QuarantineGame::GameUpdateBuilder::other(string key, uint64_t value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::other(string key, int64_t value) {
+QuarantineGame::GameUpdateBuilder *QuarantineGame::GameUpdateBuilder::other(string key, int64_t value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GameUpdateBuilder *quarantine_game::GameUpdateBuilder::other(string key, double value) {
+QuarantineGame::GameUpdateBuilder *QuarantineGame::GameUpdateBuilder::other(string key, double value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::UpdateBuilder *quarantine_game::GameUpdateBuilder::other_null(string key) {
+QuarantineGame::UpdateBuilder *QuarantineGame::GameUpdateBuilder::other_null(string key) {
     builder[key] = nullptr;
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *
-quarantine_game::GlitchUpdateBuilder::glitch_error(string message, int32_t glitch) {
+QuarantineGame::GlitchUpdateBuilder *
+QuarantineGame::GlitchUpdateBuilder::glitch_error(string message, int32_t glitch) {
     json error;
 
     error["glitch"] = glitch;
@@ -184,8 +183,8 @@ quarantine_game::GlitchUpdateBuilder::glitch_error(string message, int32_t glitc
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *
-quarantine_game::GlitchUpdateBuilder::glitch_warning(string message, int32_t glitch) {
+QuarantineGame::GlitchUpdateBuilder *
+QuarantineGame::GlitchUpdateBuilder::glitch_warning(string message, int32_t glitch) {
     json warning;
 
     warning["glitch"] = glitch;
@@ -203,8 +202,8 @@ quarantine_game::GlitchUpdateBuilder::glitch_warning(string message, int32_t gli
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *
-quarantine_game::GlitchUpdateBuilder::glitch_success(string message, int32_t glitch) {
+QuarantineGame::GlitchUpdateBuilder *
+QuarantineGame::GlitchUpdateBuilder::glitch_success(string message, int32_t glitch) {
     json success;
 
     success["glitch"] = glitch;
@@ -222,32 +221,32 @@ quarantine_game::GlitchUpdateBuilder::glitch_success(string message, int32_t gli
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *quarantine_game::GlitchUpdateBuilder::other(string key, string value) {
+QuarantineGame::GlitchUpdateBuilder *QuarantineGame::GlitchUpdateBuilder::other(string key, string value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *quarantine_game::GlitchUpdateBuilder::other(string key, bool value) {
+QuarantineGame::GlitchUpdateBuilder *QuarantineGame::GlitchUpdateBuilder::other(string key, bool value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *quarantine_game::GlitchUpdateBuilder::other(string key, uint64_t value) {
+QuarantineGame::GlitchUpdateBuilder *QuarantineGame::GlitchUpdateBuilder::other(string key, uint64_t value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *quarantine_game::GlitchUpdateBuilder::other(string key, int64_t value) {
+QuarantineGame::GlitchUpdateBuilder *QuarantineGame::GlitchUpdateBuilder::other(string key, int64_t value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::GlitchUpdateBuilder *quarantine_game::GlitchUpdateBuilder::other(string key, double value) {
+QuarantineGame::GlitchUpdateBuilder *QuarantineGame::GlitchUpdateBuilder::other(string key, double value) {
     builder[key] = value;
     return this;
 }
 
-quarantine_game::UpdateBuilder *quarantine_game::GlitchUpdateBuilder::other_null(string key) {
+QuarantineGame::UpdateBuilder *QuarantineGame::GlitchUpdateBuilder::other_null(string key) {
     builder[key] = nullptr;
     return this;
 }

@@ -8,7 +8,7 @@
 #define LAMBDA_FUNCTION_DECL [&]()
 
 using namespace std;
-using namespace quarantine_game;
+using namespace QuarantineGame;
 
 class glitch_suite : public ::testing::Test {
 protected:

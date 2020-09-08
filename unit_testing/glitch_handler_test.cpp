@@ -3,7 +3,7 @@
 #include "../utils.h"
 #include <nlohmann/json.hpp>
 
-using namespace quarantine_game;
+using namespace QuarantineGame;
 using json = nlohmann::json;
 
 TEST(GlitchHandlerSuite, test_lists) {
@@ -26,6 +26,9 @@ TEST(GlitchHandlerSuite, test_lists) {
 
 TEST(GlitchHandlerSuite, test_from_name) {
     auto a = GlitchHandler::from_name("default-list");
+    auto b = GlitchHandler::from_name("not-a-list");
+
+    ASSERT_TRUE(b.is_null());
 
     ASSERT_FALSE(a.is_null());
 
@@ -45,6 +48,11 @@ TEST(GlitchHandlerSuite, test_from_name) {
 
 TEST(GlitchHandlerSuite, test_from_id) {
     auto a = GlitchHandler::from_id("dVPJAyAPVFPJAAPf");
+
+    auto b = GlitchHandler::from_name("not-a-list");
+
+
+    ASSERT_TRUE(b.is_null());
 
     ASSERT_FALSE(a.is_null());
 
@@ -91,7 +99,8 @@ TEST(GlitchHandlerSuite, test_check_errors) {
     c["5"] = GlitchHandler::check_for_errors(b["5"]);
     c["6"] = GlitchHandler::check_for_errors(b["6"]);
 
-    auto d = Utils::read_utf8_file("/Users/niccolomattei/CLionProjects/elaborato-esame/unit_testing/bad_json_glitch_output.json");
+    auto d = Utils::read_utf8_file(
+            "/Users/niccolomattei/CLionProjects/elaborato-esame/unit_testing/bad_json_glitch_output.json");
     json e = json::parse(d);
 
     ASSERT_EQ(c, e);

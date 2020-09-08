@@ -13,7 +13,7 @@ using namespace std;
 class glitch_suite;
 class Glitch_factory_suite;
 
-namespace quarantine_game {
+namespace QuarantineGame {
     class Action {
     private:
         vector<function<void()>> runnables;
@@ -35,7 +35,7 @@ namespace quarantine_game {
 
         string message;
         string title;
-        vector<weak_ptr<Player>> required;
+        vector<shared_ptr<Player>> required;
         vector<Action> actions;
         vector<string> buttons;
         uint8_t requires;
@@ -45,14 +45,11 @@ namespace quarantine_game {
         const string &_message() const;
         const string &_title() const;
         const vector<string> &_buttons() const;
-        weak_ptr<Player> get_player() const;
+        shared_ptr<Player> get_player() const;
         const uint8_t action_count();
         void choose_action(uint8_t option);
 
     };
-
-
-
 
 }
 

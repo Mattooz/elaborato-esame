@@ -12,18 +12,17 @@
 
 using namespace std;
 
-namespace quarantine_game {
+namespace QuarantineGame {
     /**
-     * Class containing miscellaneous static methods.
+     * Namespace containing miscellaneous static methods.
      */
-    class Utils {
-    public:
+    namespace Utils {
         /**
         * Generates a pseudo-random 64-bit unsigned integer.
         *
         * @return a 64-bit uinsigned integer
         */
-        static uint64_t get_random_long();
+        uint64_t get_random_long();
 
         /**
          * Reads a file from storage.
@@ -31,19 +30,25 @@ namespace quarantine_game {
          * @param path_to_file the path of the file.
          * @return the contents of the file. If it fails to find the file returns "not found".
          */
-        static string read_file(const string &path_to_file) noexcept;
+        string read_file(const string &path_to_file) noexcept;
 
-        static wstring read_utf8_file(const string &path_to_file) noexcept;
+        /**
+         * Reads an utf-8 file from storage.
+         *
+         * @param path_to_file the path of the file
+         * @return a wstring with the contents of the file.
+         */
+        wstring read_utf8_file(const string &path_to_file) noexcept;
 
-        static uint8_t get_random_dice();
+        uint8_t get_random_dice();
 
-        static uint32_t get_random_num(uint32_t max);
+        uint32_t get_random_num(uint32_t max);
 
-        static vector<string> split(const string &input, const string &regex);
+        vector<string> split(const string &input, const string &regex);
 
-        static bool is_number(string s);
+        bool is_number(string s);
 
-        static bool is_integer(string s);
+        bool is_integer(string s);
     };
 
     class game_error : public exception {
@@ -51,6 +56,7 @@ namespace quarantine_game {
         string _what;
     public:
         explicit game_error(const string &what);
+
         const char *what() const noexcept override;
     };
 }

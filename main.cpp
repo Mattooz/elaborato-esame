@@ -19,13 +19,14 @@
 const string web_pages = "/Users/niccolomattei/CLionProjects/elaborato-esame/resources/web_pages";
 
 using namespace std;
-using namespace quarantine_game;
+using namespace QuarantineGame;
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using json = nlohmann::json;
 using namespace boost;
 
 HttpServer server;
-vector <std::shared_ptr<Game>> games;
+vector<std::shared_ptr<Game>> games;
+
 
 std::map<string, string> parse_cookies(SimpleWeb::CaseInsensitiveMultimap &header) {
     auto it = header.find("Cookie");
@@ -42,7 +43,7 @@ std::map<string, string> parse_cookies(SimpleWeb::CaseInsensitiveMultimap &heade
         boost::algorithm::trim(c);
         boost::algorithm::trim(d);
 
-        pair <string, string> entry{c, d};
+        pair<string, string> entry{c, d};
 
         res.insert(entry);
     }
@@ -81,16 +82,24 @@ void setup_web_server() {
         string host = form["creator"];
         try {
             Game g{host, 2000, "default-list", "default-map"};
-            g.get_player(host).lock()->add_update(g.create_default_update());
+
+            g.get_player(host)->add_update(g.create_default_update());
             games.push_back(make_shared<Game>(g));
             json res;
 
+            res["ok"] = true;
             res["creator"] = host;
             res["uuid"] = g._id();
             res["starting_money"] = 2000;
             response->write(res.dump());
+
+            spdlog::info("Game created. (host: " + host + ", id: " + g._id() + ")");
         } catch (std::exception &e) {
+            auto a = Game::not_ok_status;
+            a["error"] = e.what();
+            response->write(a.dump());
             spdlog::error(e.what());
+            return;
         }
     };
 
@@ -105,14 +114,14 @@ void setup_web_server() {
         auto game = get_game(id);
         if (game != nullptr) {
             auto p = game->get_player(player);
-            if (!p.expired()) {
+            if (p) {
                 if (form.find("turn") != form.end()) {
                     json obj;
 
                     obj["turn"] = game->get_player_turn(player);
 
                     response->write(obj.dump());
-                } else response->write(game->get_player(player).lock()->get_update().dump());
+                } else response->write(game->get_player(player)->get_update().dump());
             } else response->write(SimpleWeb::StatusCode::client_error_not_found);
         } else response->write(SimpleWeb::StatusCode::client_error_not_found);
 
@@ -135,14 +144,14 @@ void setup_web_server() {
             if (type == "buy") {
                 IFELSE_LADDER else {
                     auto player = game->get_player(name);
-                    if (player.expired()) {
+                    if (!player) {
                         response->write(Game::not_ok_status.dump());
                     }
-                    auto box = game->map()[player.lock()->_position()];
-                    auto cast = dynamic_pointer_cast<PropertyBox>(box.lock());
+                    auto box = game->map()[player->_position()];
+                    auto cast = dynamic_pointer_cast<PropertyBox>(box);
 
                     if (cast) {
-                        if (cast->_owner() == quarantine_game::Map::not_found) {
+                        if (cast->_owner() == QuarantineGame::Map::not_found) {
                             TRY_CATCH(game->buy_property(cast->_id(), name);)
                             response->write(Game::ok_status.dump());
                         } else response->write(Game::not_ok_status.dump());
@@ -171,7 +180,7 @@ void setup_web_server() {
 
                     auto box = game->map()[property];
 
-                    auto cast = dynamic_pointer_cast<PropertyBox>(box.lock());
+                    auto cast = dynamic_pointer_cast<PropertyBox>(box);
 
                     if (cast->_owner() != game->get_player_turn(name))
                         response->write(Game::not_ok_status.dump());
@@ -202,51 +211,44 @@ void setup_web_server() {
         }
     };
 
-    SET("^/join/([\\s\\S]+)$", "GET") {
-        string id = request->path_match[1];
+    SET("^/join/([\\s\\S]+)$", "POST") {
+        try {
+            json form = json::parse(request->content.string());
 
-        if (ShortId::is_id(id)) {
+            string name = form["name"];
+            string id = form["id"];
             auto game = get_game(id);
 
-            if (game != nullptr) {
-                string page = Utils::read_file(web_pages + "/join.html");
+            if (name.empty()) response->write(SimpleWeb::StatusCode::server_error_internal_server_error);
+            else if (!ShortId::is_id(id)) response->write(SimpleWeb::StatusCode::server_error_internal_server_error);
+            else if (game == nullptr) response->write(SimpleWeb::StatusCode::server_error_internal_server_error);
+            else {
+                json res;
+                if (game->started()) {
+                    res["ok"] = false;
+                    res["error"] = u8"La partita è già iniziata";
+                    spdlog::info("Player failed to join game: " + id + ". (Game already started)");
 
-                replace_all(page, "%UUID%", id);
+                } else if (game->get_player(name)) {
+                    res["ok"] = false;
+                    res["error"] = u8"Questo nome è già stato usato nella partita";
 
-                response->write(page);
+                    spdlog::info("Player failed to join game: " + id + ". (Name already used)");
+                } else if (game->full()) {
+                    res["ok"] = false;
+                    res["error"] = u8"Questa partita è già piena";
 
-            } else response->write(Utils::read_file(web_pages + "/404.html"));
-        } else response->write(Utils::read_file(web_pages + "/404.html"));
-    };
+                    spdlog::info("Player failed to join game: " + id + ". (Game is full)");
+                } else {
+                    res["ok"] = true;
+                    game->add_player(name);
+                    game->send_to_all(game->create_default_update());
+                }
 
-    SET("^/join/([\\s\\S]+)$", "POST") {
-        json form = json::parse(request->content.string());
-
-        string name = form["name"];
-        string id = form["id"];
-        auto game = get_game(id);
-
-        if (name.empty()) response->write(SimpleWeb::StatusCode::server_error_internal_server_error);
-        else if (!ShortId::is_id(id)) response->write(SimpleWeb::StatusCode::server_error_internal_server_error);
-        else if (game == nullptr) response->write(SimpleWeb::StatusCode::server_error_internal_server_error);
-        else {
-            json res;
-            if (game->started()) {
-                res["ok"] = false;
-                res["error"] = u8"La partita è già iniziata";
-            } else if (!game->get_player(name).expired()) {
-                res["ok"] = false;
-                res["error"] = u8"Questo nome è già stato usato nella partita";
-            } else if (game->full()) {
-                res["ok"] = false;
-                res["error"] = u8"Questa partita è già piena";
-            } else {
-                res["ok"] = true;
-                game->add_player(name);
-                game->send_to_all(game->create_default_update());
+                response->write(res.dump());
             }
-
-            response->write(res.dump());
+        } catch (std::exception &e) {
+            spdlog::error(e.what());
         }
     };
 
@@ -254,7 +256,35 @@ void setup_web_server() {
         string s = request->path_match[0];
         s = s.substr(1, s.size() - 1);
 
-        if (ShortId::is_id(s)) {
+        if (s.substr(0, 4) == "join") {
+            string id = s.substr(5, s.size() - 1);
+            spdlog::info("Requested join page for game: " + id + ".");
+
+            try {
+                if (ShortId::is_id(id)) {
+                    auto game = get_game(id);
+
+                    if (game != nullptr) {
+                        string page = Utils::read_file(web_pages + "/join.html");
+
+                        replace_all(page, "%UUID%", id);
+
+                        response->write(page);
+
+                        spdlog::info("Join page opened successfully for game: " + id + ".");
+
+                    } else {
+                        spdlog::info("Failed to open join page. Game not found at id: " + id + ".");
+                        response->write(Utils::read_file(web_pages + "/404.html"));
+                    }
+                } else {
+                    spdlog::info("Failed to open join page. Id isn't in correct format: " + id + ".");
+                    response->write(Utils::read_file(web_pages + "/404.html"));
+                }
+            } catch (std::exception &e) {
+                spdlog::error(e.what());
+            }
+        } else if (ShortId::is_id(s)) {
             auto game = get_game(s);
             if (game != nullptr) {
                 auto cookies = parse_cookies(request->header);
@@ -270,6 +300,7 @@ void setup_web_server() {
 
 int main() {
     setup_web_server();
+    spdlog::info("Server started up successfully.");
     server.start();
 
     return 0;

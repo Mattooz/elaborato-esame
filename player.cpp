@@ -4,7 +4,7 @@
 
 #include "player.h"
 
-quarantine_game::Player::Player(string name, double money, uint8_t position, function<void()> quit)
+QuarantineGame::Player::Player(string name, double money, uint8_t position, function<void()> quit)
         : name(name), money(money), position(position), quit(quit) {
     this->turns_in_prison = 0;
     this->blocked_for = 0;
@@ -12,44 +12,44 @@ quarantine_game::Player::Player(string name, double money, uint8_t position, fun
     this->has_quit = false;
 }
 
-const string &quarantine_game::Player::_name() const {
+const string &QuarantineGame::Player::_name() const {
     return Player::name;
 }
 
-double &quarantine_game::Player::_money() {
+double &QuarantineGame::Player::_money() {
     return Player::money;
 }
 
-uint8_t &quarantine_game::Player::_position() {
+uint8_t &QuarantineGame::Player::_position() {
     return Player::position;
 }
 
-uint8_t &quarantine_game::Player::_turns_in_prison() {
+uint8_t &QuarantineGame::Player::_turns_in_prison() {
     return Player::turns_in_prison;
 }
 
-int8_t &quarantine_game::Player::_blocked_for() {
+int8_t &QuarantineGame::Player::_blocked_for() {
     return Player::blocked_for;
 }
 
-int8_t &quarantine_game::Player::_avoid() {
+int8_t &QuarantineGame::Player::_avoid() {
     return Player::avoid;
 }
 
-bool quarantine_game::Player::_has_quit() const {
+bool QuarantineGame::Player::_has_quit() const {
     return Player::has_quit;
 }
 
-void quarantine_game::Player::add_update(const json &update) {
+void QuarantineGame::Player::add_update(const json &update) {
     if (!has_quit)
         Player::updates.push_back(update);
 }
 
-void quarantine_game::Player::delete_updates() {
+void QuarantineGame::Player::delete_updates() {
     Player::updates.clear();
 }
 
-json quarantine_game::Player::get_update() {
+json QuarantineGame::Player::get_update() {
     if (has_quit) {
         has_quit = false;
         //TODO add send rejoin update
@@ -67,10 +67,10 @@ json quarantine_game::Player::get_update() {
     return res;
 }
 
-bool quarantine_game::Player::operator==(quarantine_game::Player p) {
+bool QuarantineGame::Player::operator==(QuarantineGame::Player p) const {
     return name == p._name() && position != p._position();
 }
 
-bool quarantine_game::Player::operator!=(quarantine_game::Player p) {
+bool QuarantineGame::Player::operator!=(QuarantineGame::Player p) const {
     return name != p._name() && position != p._position();
 }

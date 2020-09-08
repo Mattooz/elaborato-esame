@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include "../game.h"
 
-using namespace quarantine_game;
+using namespace QuarantineGame;
 
 class GameSuite : public ::testing::Test {
 protected:
@@ -22,7 +22,7 @@ protected:
 
 TEST_F(GameSuite, test_get_players) {
     for (const auto &a : test_game.get_players()) {
-        ASSERT_FALSE(a.expired());
+        ASSERT_TRUE(a);
     }
 }
 
@@ -32,7 +32,7 @@ TEST_F(GameSuite, test_start) {
     ASSERT_TRUE(test_game.started());
 
     for (auto a : test_game.get_players()) {
-        auto b = a.lock();
+        auto b = a;
 
         ASSERT_TRUE(b->get_update()["isNew"].get<bool>());
         ASSERT_FALSE(b->get_update()["isNew"].get<bool>());
@@ -48,21 +48,21 @@ TEST_F(GameSuite, test_full) {
 TEST_F(GameSuite, test_get_player_from_turn) {
     auto p = test_game.get_player(0);
 
-    ASSERT_FALSE(p.expired());
+    ASSERT_TRUE(p);
 
     auto p1 = test_game.get_player(6);
 
-    ASSERT_TRUE(p1.expired());
+    ASSERT_FALSE(p1);
 }
 
 TEST_F(GameSuite, test_get_player_from_name) {
     auto p = test_game.get_player("Giocatore Host");
 
-    ASSERT_FALSE(p.expired());
+    ASSERT_TRUE(p);
 
     auto p1 = test_game.get_player("Not-a-player");
 
-    ASSERT_TRUE(p1.expired());
+    ASSERT_FALSE(p1);
 }
 
 TEST_F(GameSuite, test_get_player_turn) {
@@ -76,7 +76,7 @@ TEST_F(GameSuite, test_get_player_turn) {
 }
 
 TEST_F(GameSuite, test_move_player_normal) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
     ASSERT_NO_THROW(test_game.move_player(0, test_game.get_player(0), 3, 3, 6, false));
 
@@ -90,7 +90,7 @@ TEST_F(GameSuite, test_move_player_normal) {
 
     ASSERT_NO_THROW(test_game.move_player(1, test_game.get_player(1), 3, 3, 6, false));
 
-    auto b = test_game.get_player(1).lock();
+    auto b = test_game.get_player(1);
 
     ASSERT_EQ(b->_position(), 0);
     ASSERT_FALSE(a->get_update()["isNew"].get<bool>());
@@ -111,10 +111,10 @@ TEST_F(GameSuite, test_move_player_normal) {
 }
 
 TEST_F(GameSuite, test_move_player_on_property) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
-    test_game.map()["Coverciano"].lock()->_owner() = 1;
-    test_game.map()["Coverciano"].lock()->_houses() = 1;
+    test_game.map()["Coverciano"]->_owner() = 1;
+    test_game.map()["Coverciano"]->_houses() = 1;
 
     test_game.start();
 
@@ -124,7 +124,7 @@ TEST_F(GameSuite, test_move_player_on_property) {
 
     ASSERT_NO_THROW(test_game.move_player(0, test_game.get_player(0), 3, 3, 6, false));
 
-    auto b = test_game.get_player(1).lock();
+    auto b = test_game.get_player(1);
 
     json upd = a->get_update();
 
@@ -141,10 +141,10 @@ TEST_F(GameSuite, test_move_player_on_property) {
 }
 
 TEST_F(GameSuite, test_move_player_on_property_with_redirect) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
-    test_game.map()["Coverciano"].lock()->_owner() = 1;
-    test_game.map()["Coverciano"].lock()->_houses() = 1;
+    test_game.map()["Coverciano"]->_owner() = 1;
+    test_game.map()["Coverciano"]->_houses() = 1;
 
     test_game.redirect() = 2;
 
@@ -154,7 +154,7 @@ TEST_F(GameSuite, test_move_player_on_property_with_redirect) {
 
     ASSERT_NO_THROW(test_game.move_player(0, test_game.get_player(0), 3, 3, 6, false));
 
-    auto b = test_game.get_player(2).lock();
+    auto b = test_game.get_player(2);
 
     json upd = a->get_update();
 
@@ -171,7 +171,7 @@ TEST_F(GameSuite, test_move_player_on_property_with_redirect) {
 }
 
 TEST_F(GameSuite, test_move_player_on_glitch) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
     test_game.start();
     //Discard first update
@@ -194,7 +194,7 @@ TEST_F(GameSuite, test_move_player_on_glitch) {
 }
 
 TEST_F(GameSuite, test_move_player_on_glitch_with_avoid) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
     a->_avoid() = 3;
 
@@ -220,7 +220,7 @@ TEST_F(GameSuite, test_move_player_on_glitch_with_avoid) {
 }
 
 TEST_F(GameSuite, test_roll_dice_and_move_normal) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
     test_game.roll_dice(0);
 
@@ -233,7 +233,7 @@ TEST_F(GameSuite, test_roll_dice_and_move_normal) {
 
     test_game.roll_dice(1);
 
-    auto b = test_game.get_player(1).lock();
+    auto b = test_game.get_player(1);
 
     ASSERT_EQ(b->_position(), 0);
     ASSERT_FALSE(a->get_update()["isNew"].get<bool>());
@@ -256,7 +256,7 @@ TEST_F(GameSuite, test_roll_dice_and_move_normal) {
 }
 
 TEST_F(GameSuite, test_roll_dice_and_move_in_prison) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
     a->_turns_in_prison() = 3;
 
     test_game.start();
@@ -302,7 +302,7 @@ TEST_F(GameSuite, test_roll_dice_and_move_in_prison) {
 }
 
 TEST_F(GameSuite, test_roll_dice_and_move_with_negative_money) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
     /*
      * Arbitrary amount of negative money
      */
@@ -333,7 +333,7 @@ TEST_F(GameSuite, test_roll_dice_and_move_with_negative_money) {
 }
 
 TEST_F(GameSuite, test_roll_dice_and_move_with_debug_goto_prison) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
     test_game.goto_prison = true;
 
@@ -374,7 +374,7 @@ TEST_F(GameSuite, test_next_player_normal) {
 }
 
 TEST_F(GameSuite, test_next_player_blocked) {
-    auto a = test_game.get_player(1).lock();
+    auto a = test_game.get_player(1);
 
     a->_blocked_for() = 3;
 
@@ -396,10 +396,10 @@ TEST_F(GameSuite, test_next_player_can_roll_again) {
 }
 
 TEST_F(GameSuite, test_buy_property_normal) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
     ASSERT_NO_THROW(test_game.buy_property(2, 0));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_owner(), Map::not_found);
+    ASSERT_EQ(test_game.map().from_id(2)->_owner(), Map::not_found);
 
     test_game.start();
 
@@ -407,16 +407,16 @@ TEST_F(GameSuite, test_buy_property_normal) {
     a->get_update();
 
     ASSERT_NO_THROW(test_game.buy_property(2, 1));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_owner(), Map::not_found);
+    ASSERT_EQ(test_game.map().from_id(2)->_owner(), Map::not_found);
 
     ASSERT_NO_THROW(test_game.buy_property(2, 0));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_owner(), Map::not_found);
+    ASSERT_EQ(test_game.map().from_id(2)->_owner(), Map::not_found);
     ASSERT_EQ(a->_money(), 2000);
 
     a->_position() = 4;
 
     ASSERT_NO_THROW(test_game.buy_property(2, 0));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_owner(), 0);
+    ASSERT_EQ(test_game.map().from_id(2)->_owner(), 0);
     ASSERT_EQ(a->_money(), 1900);
 
     json upd = a->get_update();
@@ -430,7 +430,7 @@ TEST_F(GameSuite, test_buy_property_normal) {
 }
 
 TEST_F(GameSuite, test_buy_property_not_enough_money) {
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
     a->_money() = 50;
 
     test_game.start();
@@ -438,7 +438,7 @@ TEST_F(GameSuite, test_buy_property_not_enough_money) {
     //Discard first update
     a->get_update();
     ASSERT_NO_THROW(test_game.buy_property(2, 0));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_owner(), Map::not_found);
+    ASSERT_EQ(test_game.map().from_id(2)->_owner(), Map::not_found);
     ASSERT_EQ(a->_money(), 50);
 
     json upd = a->get_update();
@@ -451,32 +451,32 @@ TEST_F(GameSuite, test_buy_property_not_enough_money) {
 }
 
 TEST_F(GameSuite, test_buy_house_normal) {
-    auto a = test_game.get_player(0).lock();
-    auto b = test_game.get_player(1).lock();
+    auto a = test_game.get_player(0);
+    auto b = test_game.get_player(1);
 
-    test_game.map().from_id(2).lock()->_owner() = 0;
-    test_game.map().from_id(3).lock()->_owner() = 1;
+    test_game.map().from_id(2)->_owner() = 0;
+    test_game.map().from_id(3)->_owner() = 1;
 
     ASSERT_NO_THROW(test_game.buy_house(0, 2, 3));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_houses(), 0);
+    ASSERT_EQ(test_game.map().from_id(2)->_houses(), 0);
     ASSERT_EQ(a->_money(), 2000);
 
     ASSERT_NO_THROW(test_game.buy_house(1, 3, 3));
-    ASSERT_EQ(test_game.map().from_id(3).lock()->_houses(), 0);
+    ASSERT_EQ(test_game.map().from_id(3)->_houses(), 0);
     ASSERT_EQ(b->_money(), 2000);
 
     test_game.start();
 
     ASSERT_NO_THROW(test_game.buy_house(0, 2, 3));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_houses(), 3);
+    ASSERT_EQ(test_game.map().from_id(2)->_houses(), 3);
     ASSERT_EQ(a->_money(), 1850);
 
     ASSERT_NO_THROW(test_game.buy_house(1, 3, 3));
-    ASSERT_EQ(test_game.map().from_id(3).lock()->_houses(), 0);
+    ASSERT_EQ(test_game.map().from_id(3)->_houses(), 0);
     ASSERT_EQ(b->_money(), 2000);
 
     ASSERT_NO_THROW(test_game.buy_house(0, 2, 2));
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_houses(), 2);
+    ASSERT_EQ(test_game.map().from_id(2)->_houses(), 2);
     ASSERT_EQ(a->_money(), 1875);
 
     //Reset the map. Apparently the Map doesn't get reset after each test.
@@ -490,9 +490,9 @@ TEST_F(GameSuite, test_player_quit_not_started) {
     test_game.player_quit(0);
 
     ASSERT_EQ(test_game.player_count(), 4);
-    ASSERT_EQ(test_game.get_player(0).lock()->_name(), "Giocatore-1");
+    ASSERT_EQ(test_game.get_player(0)->_name(), "Giocatore-1");
 
-    auto a = test_game.get_player(0).lock();
+    auto a = test_game.get_player(0);
 
     json upd = a->get_update();
 
@@ -502,12 +502,12 @@ TEST_F(GameSuite, test_player_quit_not_started) {
 }
 
 TEST_F(GameSuite, test_player_quit_started) {
-    test_game.map().from_id(2).lock()->_owner() = 0;
-    test_game.map().from_id(3).lock()->_owner() = 0;
+    test_game.map().from_id(2)->_owner() = 0;
+    test_game.map().from_id(3)->_owner() = 0;
 
     test_game.start();
 
-    auto a = test_game.get_player(1).lock();
+    auto a = test_game.get_player(1);
     //Discard first update
     a->get_update();
 
@@ -518,15 +518,15 @@ TEST_F(GameSuite, test_player_quit_started) {
 
 
     ASSERT_EQ(test_game.player_count(), 5);
-    ASSERT_EQ(test_game.get_player(0).lock()->_name(), "Giocatore Host");
+    ASSERT_EQ(test_game.get_player(0)->_name(), "Giocatore Host");
     ASSERT_EQ(test_game._turns(), 1);
 
     auto b = test_game.get_offline_player("Giocatore Host");
 
-    ASSERT_FALSE(b.expired());
+    ASSERT_TRUE(b);
 
-    ASSERT_EQ(test_game.map().from_id(2).lock()->_owner(), Map::not_found);
-    ASSERT_EQ(test_game.map().from_id(3).lock()->_owner(), Map::not_found);
+    ASSERT_EQ(test_game.map().from_id(2)->_owner(), Map::not_found);
+    ASSERT_EQ(test_game.map().from_id(3)->_owner(), Map::not_found);
 
     json upd = a->get_update();
 
@@ -536,12 +536,12 @@ TEST_F(GameSuite, test_player_quit_started) {
 }
 
 TEST_F(GameSuite, test_player_rejoin) {
-    test_game.map().from_id(2).lock()->_owner() = 1;
-    test_game.map().from_id(3).lock()->_owner() = 1;
+    test_game.map().from_id(2)->_owner() = 1;
+    test_game.map().from_id(3)->_owner() = 1;
 
     test_game.start();
 
-    auto a = test_game.get_player(1).lock();
+    auto a = test_game.get_player(1);
     //Discard first update
     a->get_update();
 
@@ -553,11 +553,11 @@ TEST_F(GameSuite, test_player_rejoin) {
 
     test_game.player_rejoin("Giocatore Host");
 
-    auto b = test_game.get_player(0).lock();
+    auto b = test_game.get_player(0);
 
     auto c = test_game.get_offline_player("Giocatore Host");
 
-    ASSERT_TRUE(c.expired());
+    ASSERT_FALSE(c);
 
     json upd = a->get_update();
 

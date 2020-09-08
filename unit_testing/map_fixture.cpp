@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../map.h"
 
-using namespace quarantine_game;
+using namespace QuarantineGame;
 
 class map_suite : public ::testing::Test {
 protected:
@@ -24,8 +24,8 @@ protected:
     shared_ptr<Box> box12{new PropertyBox(11, 7, 50, "test-8")};
     shared_ptr<Box> box13{new PropertyBox(12, 8, 50, "test-9")};
 
-    quarantine_game::Map map{{box1, box2, box3, box4, box5, box6, box7, box8, box9, box10, box11, box12, box13},
-                             "name", "id"};
+    QuarantineGame::Map map{{box1, box2, box3, box4, box5, box6, box7, box8, box9, box10, box11, box12, box13},
+                            "name", "id"};
 
 };
 
@@ -50,16 +50,16 @@ TEST_F(map_suite, test_pos) {
 }
 
 TEST_F(map_suite, test_op_pos) {
-    auto it = map[10].lock();
-    auto it1 = map[11].lock();
+    auto it = map[10];
+    auto it1 = map[11];
 
     auto functional = dynamic_pointer_cast<FunctionalBox>(it);
-    string type;
+    FunctionalBox::BoxType type;
 
     if (functional) type = functional->_type();
 
     EXPECT_TRUE(functional);
-    ASSERT_EQ(type, "goto-prison");
+    ASSERT_EQ(type, FunctionalBox::BoxType::GOTO_PRISON);
 
     auto property = dynamic_pointer_cast<PropertyBox>(it1);
     string name;
@@ -79,8 +79,8 @@ TEST_F(map_suite, test_op_pos) {
 }
 
 TEST_F(map_suite, test_op_name) {
-    auto it = map["test-2"].lock();
-    auto it1 = map["test not found"].lock();
+    auto it = map["test-2"];
+    auto it1 = map["test not found"];
 
     auto property = dynamic_pointer_cast<PropertyBox>(it);
 
@@ -103,8 +103,8 @@ TEST_F(map_suite, test_op_name) {
 }
 
 TEST_F(map_suite, test_fromid) {
-    auto it = map.from_id(1).lock();
-    auto it1 = map.from_id(9).lock();
+    auto it = map.from_id(1);
+    auto it1 = map.from_id(9);
 
     auto property = dynamic_pointer_cast<PropertyBox>(it);
 

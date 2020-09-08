@@ -14,7 +14,7 @@ using namespace std;
 
 class Glitch_factory_suite;
 
-namespace quarantine_game {
+namespace QuarantineGame {
 
     /**
      * The game class handles almost all of the logic (together with the web_server) of the game itself.
@@ -27,11 +27,11 @@ namespace quarantine_game {
         double starting_money;
         uint32_t turns;
         vector<shared_ptr<Player>> players;
-        vector<weak_ptr<Player>> offline_players;
+        vector<shared_ptr<Player>> offline_players;
         bool has_started;
         GlitchFactory factory;
         Glitch glitch;
-        quarantine_game::Map game_map;
+        QuarantineGame::Map game_map;
         friend class ::Glitch_factory_suite;
 
     public:
@@ -71,7 +71,7 @@ namespace quarantine_game {
          *
          * @return a map
          */
-        quarantine_game::Map &map();
+        QuarantineGame::Map &map();
 
         /**
          * Checks if the game is full or not. The max amount of players is 6.
@@ -103,22 +103,22 @@ namespace quarantine_game {
         void add_player(string name);
 
         /**
-         * Finds a player from its turn in the game. If it finds the player it returns a shared_ptr made from a weak_ptr
-         * using weak_ptr.lock(). If no player is found it returns a null shared_ptr.
+         * Finds a player from its turn in the game. If it finds the player it returns a shared_ptr made from a shared_ptr
+         * using shared_ptr.lock(). If no player is found it returns a null shared_ptr.
          *
          * @param turn the turn of the player
          * @return a shared_ptr containing the player.
          */
-        weak_ptr<Player> get_player(uint32_t turn);
+        shared_ptr<Player> get_player(uint32_t turn) const;
 
         /**
-         * Finds a player from its name in the game. If it finds the player it returns a shared_ptr made from a weak_ptr
-         * using lock(). If no player is found it returns a null shared_ptr.
+         * Finds a player from its name in the game. If it finds the player it returns a valid shared_ptr or a null ptr.
+         * If no player is found it returns a null shared_ptr.
          *
          * @param turn the turn of the player
          * @return a shared_ptr containing the player.
          */
-        weak_ptr<Player> get_player(string name);
+        shared_ptr<Player> get_player(string name) const;
 
         /**
          * Finds the player turn from the given name inside of the game. If no player is found it returns
@@ -130,12 +130,11 @@ namespace quarantine_game {
         const uint8_t get_player_turn(string name) const;
 
         /**
-         * Returns a copy of the player list made from weak pointers. If any of these pointers is expired for whatever
-         * reason it throws a game_error.
+         * Returns the player list.
          *
-         * @return a copy list of the players
+         * @return a list of the players
          */
-        vector<weak_ptr<Player>> get_players();
+        vector<shared_ptr<Player>>& get_players();
 
         /**
          * Returns an offline player from the offline players vector. If no player is found it returns a null
@@ -144,7 +143,7 @@ namespace quarantine_game {
          * @param name the name of the offline player
          * @return a shared_ptr containing the offline_player
          */
-        weak_ptr<quarantine_game::Player> get_offline_player(string name);
+        shared_ptr<QuarantineGame::Player> get_offline_player(string name) const;
 
         /**
          * Finds the owner of a given property. If the property is not found or it has no owner it returns
@@ -154,14 +153,6 @@ namespace quarantine_game {
          * @return the owner or @see game::not_found
          */
         uint8_t get_property_owner(uint8_t property);
-
-        /**
-         * Checks if the property is owned or not.
-         *
-         * @param property the property id.
-         * @return true or false
-         */
-        bool is_property_owned(uint8_t property);
 
         /**
          * Rolls the dices for a given a player. It checks various factors and chooses the
@@ -188,7 +179,7 @@ namespace quarantine_game {
          * @param dice1 the first dice rolled.
          * @param dice2 the second dice rolled.
          */
-        void move_player(uint8_t p_turn, const weak_ptr<Player>& player, uint8_t dice1, uint8_t dice2);
+        void move_player(uint8_t p_turn, const shared_ptr<Player>& player, uint8_t dice1, uint8_t dice2);
 
         /**
          * Moves the player. If the movement is instant the new_pos param indicates the actual new position of the
@@ -204,7 +195,7 @@ namespace quarantine_game {
          * @param new_pos the new position of the player. Should be passed as described earlier.
          * @param instant determines whether the player will be move instantly or not.
          */
-        void move_player(uint8_t p_turn, weak_ptr<Player> player, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant);
+        void move_player(uint8_t p_turn, shared_ptr<Player> player, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant);
 
         void buy_property(uint8_t property, uint8_t player);
 
@@ -221,8 +212,6 @@ namespace quarantine_game {
         GlitchGameContainer get_game_container();
 
         json create_default_update();
-
-        json create_move_update(uint8_t player, uint8_t dice1, uint8_t dice2, bool instant);
 
         json create_move_update(uint8_t player, uint8_t dice1, uint8_t dice2, uint8_t new_pos, bool instant);
 

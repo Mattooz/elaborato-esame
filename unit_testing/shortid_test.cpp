@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../shortid.h"
 
-using namespace quarantine_game;
+using namespace QuarantineGame;
 
 /*
  * Using constant number to generate an id and test if the code worked.

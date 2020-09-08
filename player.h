@@ -13,7 +13,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-namespace quarantine_game {
+namespace QuarantineGame {
 
     class Player {
     private:
@@ -35,7 +35,7 @@ namespace quarantine_game {
 
         double &_money();
 
-        uint8_t & _position();
+        uint8_t &_position();
 
         uint8_t &_turns_in_prison();
 
@@ -51,8 +51,9 @@ namespace quarantine_game {
 
         json get_update();
 
-        bool operator!=(Player p);
-        bool operator==(Player p);
+        bool operator!=(Player p) const;
+
+        bool operator==(Player p) const;
     };
 
 }

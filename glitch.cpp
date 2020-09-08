@@ -5,43 +5,43 @@
 #include "glitch.h"
 #include <iostream>
 
-void quarantine_game::Action::operator+(const function<void()> &runnable) {
+void QuarantineGame::Action::operator+(const function<void()> &runnable) {
     runnables.push_back(runnable);
 }
 
-void quarantine_game::Action::run() {
+void QuarantineGame::Action::run() {
     for (auto &it : runnables)
         it();
 }
 
 
-quarantine_game::Glitch::Glitch(const string &message, const string &title, const vector<Action> &actions,
-                                const vector<string> &buttons, uint8_t requires) : message(message), title(title),
+QuarantineGame::Glitch::Glitch(const string &message, const string &title, const vector<Action> &actions,
+                               const vector<string> &buttons, uint8_t requires) : message(message), title(title),
                                                                                    actions(actions),
                                                                                    buttons(buttons),
                                                                                    requires(requires){}
 
-const string &quarantine_game::Glitch::_message() const {
+const string &QuarantineGame::Glitch::_message() const {
     return message;
 }
 
-const string &quarantine_game::Glitch::_title() const {
+const string &QuarantineGame::Glitch::_title() const {
     return title;
 }
 
-const vector<string> &quarantine_game::Glitch::_buttons() const {
+const vector<string> &QuarantineGame::Glitch::_buttons() const {
     return buttons;
 }
 
-weak_ptr<quarantine_game::Player> quarantine_game::Glitch::get_player() const {
+shared_ptr<QuarantineGame::Player> QuarantineGame::Glitch::get_player() const {
     return required[0];
 }
 
-const uint8_t quarantine_game::Glitch::action_count() {
+const uint8_t QuarantineGame::Glitch::action_count() {
     return actions.size();
 }
 
-void quarantine_game::Glitch::choose_action(uint8_t option) {
+void QuarantineGame::Glitch::choose_action(uint8_t option) {
     if (option >= actions.size())
         return;
 

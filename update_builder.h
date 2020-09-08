@@ -11,7 +11,7 @@ using namespace std;
 using namespace nlohmann;
 
 
-namespace quarantine_game {
+namespace QuarantineGame {
 
     /**
      * Contains all the info necessary to the game_update_builder class.
@@ -21,12 +21,12 @@ namespace quarantine_game {
         /*
          * The members of this struct are vectors pointing to the objects inside the Game class.
          */
-        const vector<weak_ptr<Player>> players;
+        const vector<shared_ptr<Player>> players;
         const uint32_t *turns;
         const bool *has_started;
         Map *game_map;
 
-        UpdateGameContainer(const vector<weak_ptr<Player>> players, const uint32_t *turns, const bool *hasStarted,
+        UpdateGameContainer(const vector<shared_ptr<Player>> players, const uint32_t *turns, const bool *hasStarted,
                             Map *gameMap) : players(players), turns(turns), has_started(hasStarted),
                                               game_map(gameMap) {}
     };

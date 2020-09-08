@@ -10,44 +10,40 @@
 #define ELABORATO_ESAME_GLITCH_HANDLER_H
 
 #define LAMBDA_FUNCTION_DECL [=]()
-#define EMPTY_LAMBDA [=](){}
 
 class Glitch_factory_suite;
 
-namespace quarantine_game {
+namespace QuarantineGame {
     struct GlitchGameContainer {
-        vector<weak_ptr<Player>> players;
+        vector<shared_ptr<Player>> players;
         int8_t *redirect_to;
         int8_t *can_roll_again;
         const function<json(uint8_t, uint8_t, uint8_t, uint8_t, bool)> create_move_update;
         const function<uint8_t(string)> get_player_turn;
 
-        GlitchGameContainer(vector<weak_ptr<Player>> players, int8_t *redirectTo, int8_t *canRollAgain,
+        GlitchGameContainer(vector<shared_ptr<Player>> players, int8_t *redirectTo, int8_t *canRollAgain,
                             function<json(uint8_t, uint8_t, uint8_t, uint8_t, bool)> createMoveUpdate,
                             function<uint8_t(string)> getPlayerTurn);
     };
 
-    class GlitchHandler {
-    private:
-        const static string glitch_folder;
-    public:
-        static void update_glitch_file(string id, string content);
+    namespace GlitchHandler {
+        void update_glitch_file(string id, string content);
 
-        static json from_id(string id);
+        json from_id(string id);
 
-        static json from_name(string name);
+        json from_name(string name);
 
-        static vector<string> list_names();
+        vector<string> list_names();
 
-        static vector<json> lists();
+        vector<json> lists();
 
-        static json check_for_errors(json to_check);
+        json check_for_errors(json to_check);
 
-        static json check_for_errors(json to_check, GlitchUpdateBuilder *builder);
+        json check_for_errors(json to_check, GlitchUpdateBuilder *builder);
 
-        static void check_for_action_errors(int32_t glitch, string action, GlitchUpdateBuilder *builder);
+        void check_for_action_errors(int32_t glitch, string action, GlitchUpdateBuilder *builder);
 
-        static vector<string> contains_player_reference(string message, uint8_t player_required);
+        vector<string> contains_player_reference(string message, uint8_t player_required);
     };
 
     class GlitchFactory {
@@ -59,9 +55,13 @@ namespace quarantine_game {
         Glitch building;
 
         void parse_action(string action, GlitchGameContainer &state);
-        uint8_t get_random_player(uint8_t p_turn, quarantine_game::GlitchGameContainer &state);
+
+        uint8_t get_random_player(uint8_t p_turn, QuarantineGame::GlitchGameContainer &state);
+
         json get_random_glitch(GlitchGameContainer &state);
+
         json get_glitch(int32_t which);
+
         uint32_t get_random_num();
 
     public:

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-namespace quarantine_game {
+namespace QuarantineGame {
     /**
      * Base class for all the boxes on the board.
      */
@@ -34,14 +34,19 @@ namespace quarantine_game {
         virtual ~Box();
     };
 
-    //TODO Add enum of types
+
+
 
     /**
      * Derived class from box. Used to represent the "glitch" and "prison" boxes.
      */
     class FunctionalBox : public Box {
+    public:
+        enum BoxType {
+            GOTO_PRISON, PRISON, START, OTHER, GLITCH
+        };
     private:
-        string type;
+        BoxType type;
     public:
         /**
          * Constructor for functional_box.
@@ -54,11 +59,13 @@ namespace quarantine_game {
         /**
          * @return the type of the box.
          */
-        string _type();
+        BoxType _type();
 
         const uint8_t &_position() const override;
 
         ~FunctionalBox() override;
+
+
     };
 
     /**
@@ -135,7 +142,7 @@ namespace quarantine_game {
          *
          * @param boxes a vector containing the boxes of the map.
          */
-        explicit Map(vector<shared_ptr<Box>> boxes, string map_name, string map_id);
+        Map(vector<shared_ptr<Box>> boxes, string map_name, string map_id);
 
         const string &_map_name() const;
 
@@ -149,7 +156,7 @@ namespace quarantine_game {
          * @param box the id of the property.
          * @return the cost of the property. If no property is found at the given id it returns -1.
          */
-        int32_t cost(uint8_t box);
+        int32_t cost(uint8_t box) const;
 
         /**
          * Gets the name of a specific property_box.
@@ -157,7 +164,7 @@ namespace quarantine_game {
          * @param box the id of the property.
          * @return the name of the property. If no property is found at the given id it returns "not found".
          */
-        string name(uint8_t box);
+        string name(uint8_t box) const;
 
         /**
          * Gets the id of a specific property_box.
@@ -165,7 +172,7 @@ namespace quarantine_game {
          * @param position the position of the box on the map.
          * @return the id of the property. If no property is found at the given position it returns 0xFF.
          */
-        uint8_t id(uint8_t position);
+        uint8_t id(uint8_t position) const;
 
         /**
         * Gets the pos of a specific property_box.
@@ -173,7 +180,7 @@ namespace quarantine_game {
         * @param id the id of the property.
         * @return the id of the property. If no property is found at the given id it returns 0xFF.
         */
-        uint8_t pos(uint8_t id);
+        uint8_t pos(uint8_t id) const;
 
         /**
          * Calculates the distance to the nearest glitch box. This distance must be > 1 in order to be usable.
@@ -181,7 +188,7 @@ namespace quarantine_game {
          * @param pos the position on the map.
          * @return the distance to the nearest glitch box. If no usable glitch box is found then it returns 0xFF.
          */
-        uint8_t distance_to_next_glitch(uint8_t pos);
+        uint8_t distance_to_next_glitch(uint8_t pos) const;
 
         /**
          * Checks if the box at the given position is a glitch box.
@@ -189,7 +196,7 @@ namespace quarantine_game {
          * @param pos the position that will be checked.
          * @return true or false.
          */
-        bool is_glitch(uint8_t pos);
+        bool is_glitch(uint8_t pos) const;
 
         /**
          * Calculates the distance to the nearest goto-prison box. This distance must be > 1 in order to be usable.
@@ -197,7 +204,7 @@ namespace quarantine_game {
          * @param pos the position on the map.
          * @return the distance to the goto-prison box.
          */
-        uint8_t distance_to_prison(uint8_t pos);
+        uint8_t distance_to_prison(uint8_t pos) const;
 
         /**
          * Checks if the box at the given position is a goto-prison box.
@@ -205,7 +212,7 @@ namespace quarantine_game {
          * @param pos the position that will be checked.
          * @return true or false.
          */
-        bool is_prison(uint8_t pos);
+        bool is_prison(uint8_t pos) const;
 
         /**
          * Gets all the properties that a player has.
@@ -213,32 +220,32 @@ namespace quarantine_game {
          * @param player the id of the player
          * @return the properties of the player. If the player has no properties it will return an empty vector.
          */
-        vector<weak_ptr<PropertyBox>> get_player_properties(uint8_t player);
+        vector<shared_ptr<PropertyBox>> get_player_properties(uint8_t player) const;
 
         /**
          * Deletes all the properties of a player
          *
          * @param player the id of the player
          */
-        void delete_player_properties(uint8_t player);
+        void delete_player_properties(uint8_t player) const;
 
         /**
          * @param pos the position of the box
          * @return a box. If no box is found it returns nullptr.
          */
-        weak_ptr<Box> operator[](uint8_t pos);
+        shared_ptr<Box> operator[](uint8_t pos) const;
 
         /**
          * @param name the name of the property.
          * @return a property box. If no box is found at the given name it returns nullptr.
          */
-        weak_ptr<PropertyBox> operator[](const string& name);
+        shared_ptr<PropertyBox> operator[](const string& name) const;
 
         /**
          * @param id the id of the property.
          * @return a property box. If no box is found at the given id it returns nullptr.
          */
-        weak_ptr<PropertyBox> from_id(uint8_t id);
+        shared_ptr<PropertyBox> from_id(uint8_t id) const;
 
         /**
          *

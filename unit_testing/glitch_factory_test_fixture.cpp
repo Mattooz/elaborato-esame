@@ -6,7 +6,7 @@
 #include "../game.h"
 #include "../glitch_handler.h"
 
-using namespace quarantine_game;
+using namespace QuarantineGame;
 
 class Glitch_factory_suite : public ::testing::Test {
 protected:
@@ -107,7 +107,7 @@ TEST_F(Glitch_factory_suite, test_valid_pay_glitch) {
 
     b.choose_action(0);
 
-    ASSERT_EQ(b.get_player().lock()->_money(), 1800);
+    ASSERT_EQ(b.get_player()->_money(), 1800);
 }
 
 TEST_F(Glitch_factory_suite, test_valid_cashin_glitch) {
@@ -116,7 +116,7 @@ TEST_F(Glitch_factory_suite, test_valid_cashin_glitch) {
 
     b.choose_action(0);
 
-    ASSERT_EQ(b.get_player().lock()->_money(), 2200);
+    ASSERT_EQ(b.get_player()->_money(), 2200);
 }
 
 TEST_F(Glitch_factory_suite, test_valid_cashin_rnd_glitch) {
@@ -129,7 +129,7 @@ TEST_F(Glitch_factory_suite, test_valid_cashin_rnd_glitch) {
      * The random amount of money can go from 0 to 50%. If it is 0 then
      * the amount of money won't change.
      */
-    EXPECT_GE(b.get_player().lock()->_money(), 2000);
+    EXPECT_GE(b.get_player()->_money(), 2000);
 }
 
 TEST_F(Glitch_factory_suite, test_valid_blocked_and_pay_rnd_glitch) {
@@ -138,8 +138,8 @@ TEST_F(Glitch_factory_suite, test_valid_blocked_and_pay_rnd_glitch) {
 
     b.choose_action(0);
 
-    ASSERT_LT(b.get_player().lock()->_money(), 2000);
-    ASSERT_GE(b.get_player().lock()->_blocked_for(), 1);
+    ASSERT_LT(b.get_player()->_money(), 2000);
+    ASSERT_GE(b.get_player()->_blocked_for(), 1);
 }
 
 TEST_F(Glitch_factory_suite, test_valid_get_transaction_glitch) {
@@ -166,12 +166,12 @@ TEST_F(Glitch_factory_suite, test_goto_prison) {
 
     b.choose_action(0);
 
-    ASSERT_EQ(b.get_player().lock()->_position(), 9);
-    ASSERT_EQ(b.get_player().lock()->_turns_in_prison(), 3);
+    ASSERT_EQ(b.get_player()->_position(), 9);
+    ASSERT_EQ(b.get_player()->_turns_in_prison(), 3);
 }
 
 TEST_F(Glitch_factory_suite, test_empty_glitch) {
-    auto a = quarantine_game::GlitchFactory::empty_glitch();
+    auto a = QuarantineGame::GlitchFactory::empty_glitch();
 
     ASSERT_EQ(a._title(), "empty");
     ASSERT_EQ(a._message(), "empty");
